@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4事業部統合テストシステム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .header .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .test-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-runner {
+            background: #2d3436;
+            color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .test-output {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            margin: 15px 0;
+        }
+
+        .test-line {
+            margin: 3px 0;
+            padding: 3px 5px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .test-line.pass {
+            background: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+        }
+
+        .test-line.fail {
+            background: rgba(232, 67, 147, 0.2);
+            color: #e84393;
+        }
+
+        .test-line.running {
+            background: rgba(253, 203, 110, 0.2);
+            color: #fdcb6e;
+        }
+
+        .test-line.info {
+            background: rgba(116, 185, 255, 0.2);
+            color: #74b9ff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .business-tests {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .business-test-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .business-test-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .business-test-card.pass {
+            border-color: #00b894;
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        }
+
+        .business-test-card.fail {
+            border-color: #e84393;
+            background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+        }
+
+        .business-test-card.running {
+            border-color: #fdcb6e;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            animation: pulse 2s infinite;
+        }
+
+        .business-test-card.pending {
+            border-color: #74b9ff;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .business-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .test-count {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .test-status-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            color: #333;
+        }
+
+        .test-details {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            text-align: left;
+        }
+
+        .test-item {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-result {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .result-pass {
+            background: #00b894;
+        }
+
+        .result-fail {
+            background: #e84393;
+        }
+
+        .result-running {
+            background: #fdcb6e;
+            animation: spin 1s linear infinite;
+        }
+
+        .result-pending {
+            background: #74b9ff;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            align-items: center;
+        }
+
+        .control-group {
+            flex: 1;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .control-group select, .control-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .control-group select:focus, .control-group input:focus {
+            border-color: #74b9ff;
+            outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+        }
+
+        .progress-section {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .integration-matrix {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .matrix-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+        }
+
+        .matrix-cell {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto;
+        }
+
+        .matrix-pass {
+            background: #00b894;
+        }
+
+        .matrix-fail {
+            background: #e84393;
+        }
+
+        .matrix-na {
+            background: #ddd;
+            color: #666;
+        }
+
+        .log-viewer {
+            background: #2d3436;
+            color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-content {
+            height: 250px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+        }
+
+        .log-error {
+            color: #e84393;
+        }
+
+        .log-warn {
+            color: #fdcb6e;
+        }
+
+        .log-info {
+            color: #74b9ff;
+        }
+
+        .log-success {
+            color: #00b894;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .business-tests {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .control-row {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .business-tests {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 4事業部統合テストシステム</h1>
+            <div class="subtitle">
+                同時検証・整合性確認・自動復旧 | リアルタイムテスト実行・監視システム
+            </div>
+            
+            <div class="test-status">
+                <div class="status-item">
+                    <div class="status-value" id="total-tests">156</div>
+                    <div class="status-label">総テスト数</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="passed-tests">142</div>
+                    <div class="status-label">成功</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="failed-tests">3</div>
+                    <div class="status-label">失敗</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="running-tests">11</div>
+                    <div class="status-label">実行中</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="success-rate">91.0%</div>
+                    <div class="status-label">成功率</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="test-time">8分32秒</div>
+                    <div class="status-label">実行時間</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2>🏢 事業部別テスト状況</h2>
+            <div class="business-tests">
+                <div class="business-test-card pass" id="sr-test">
+                    <div class="business-name">SR事業部</div>
+                    <div class="test-count">38/40</div>
+                    <div class="test-status-label">テスト成功</div>
+                    <div class="test-details">
+                        <div class="test-item">
+                            <span>AI予測精度</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>6店舗連携</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>アラート機能</span>
+                            <div class="test-result result-fail">✗</div>
+                        </div>
+                        <div class="test-item">
+                            <span>データ整合性</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="business-test-card running" id="rc-test">
+                    <div class="business-name">RC事業部</div>
+                    <div class="test-count">35/42</div>
+                    <div class="test-status-label">テスト実行中</div>
+                    <div class="test-details">
+                        <div class="test-item">
+                            <span>ROI計算</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>展示会分析</span>
+                            <div class="test-result result-running">⟳</div>
+                        </div>
+                        <div class="test-item">
+                            <span>コスト効率</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>予測機能</span>
+                            <div class="test-result result-pending">○</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="business-test-card pass" id="rcd-test">
+                    <div class="business-name">RCD社</div>
+                    <div class="test-count">36/38</div>
+                    <div class="test-status-label">テスト成功</div>
+                    <div class="test-details">
+                        <div class="test-item">
+                            <span>ゼロ化管理</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>効率性評価</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>業者管理</span>
+                            <div class="test-result result-fail">✗</div>
+                        </div>
+                        <div class="test-item">
+                            <span>コスト削減</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="business-test-card fail" id="w-test">
+                    <div class="business-name">W事業部</div>
+                    <div class="test-count">33/36</div>
+                    <div class="test-status-label">一部失敗</div>
+                    <div class="test-details">
+                        <div class="test-item">
+                            <span>12段階管理</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>決済最適化</span>
+                            <div class="test-result result-fail">✗</div>
+                        </div>
+                        <div class="test-item">
+                            <span>季節性分析</span>
+                            <div class="test-result result-pass">✓</div>
+                        </div>
+                        <div class="test-item">
+                            <span>統合分析</span>
+                            <div class="test-result result-fail">✗</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="card">
+                <h2>🔄 リアルタイムテスト実行</h2>
+                
+                <div class="control-panel">
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label>テストスイート</label>
+                            <select id="test-suite">
+                                <option value="all">全事業部統合</option>
+                                <option value="sr">SR事業部のみ</option>
+                                <option value="rc">RC事業部のみ</option>
+                                <option value="rcd">RCD社のみ</option>
+                                <option value="w">W事業部のみ</option>
+                                <option value="integration">統合機能のみ</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>実行モード</label>
+                            <select id="test-mode">
+                                <option value="normal">標準テスト</option>
+                                <option value="stress">負荷テスト</option>
+                                <option value="regression">回帰テスト</option>
+                                <option value="integration">統合テスト</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <button class="btn btn-success" onclick="runTests()" id="run-btn">テスト実行</button>
+                        <button class="btn btn-warning" onclick="stopTests()" id="stop-btn" disabled>実行停止</button>
+                        <button class="btn" onclick="clearResults()">結果クリア</button>
+                        <button class="btn btn-danger" onclick="emergencyStop()">緊急停止</button>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div>テスト進行状況:</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="test-progress" style="width: 0%;">0%</div>
+                    </div>
+                </div>
+
+                <div class="test-runner">
+                    <h3>📊 テスト実行ログ</h3>
+                    <div class="test-output" id="test-output">
+                        <div class="test-line info">[14:35:12] システム初期化完了</div>
+                        <div class="test-line info">[14:35:15] テストスイート読み込み完了</div>
+                        <div class="test-line pass">[14:35:18] SR事業部: データベース接続テスト - 成功</div>
+                        <div class="test-line pass">[14:35:21] RC事業部: API応答テスト - 成功</div>
+                        <div class="test-line fail">[14:35:24] W事業部: 決済システム接続 - 失敗</div>
+                        <div class="test-line running">[14:35:27] RCD社: 外部連携テスト - 実行中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔍 統合整合性検証</h2>
+                
+                <div class="integration-matrix">
+                    <h3>事業部間データ整合性マトリックス</h3>
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>SR</th>
+                                <th>RC</th>
+                                <th>RCD</th>
+                                <th>W</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>SR</th>
+                                <td><div class="matrix-cell matrix-na">-</div></td>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                                <td><div class="matrix-cell matrix-fail">✗</div></td>
+                            </tr>
+                            <tr>
+                                <th>RC</th>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                                <td><div class="matrix-cell matrix-na">-</div></td>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                            </tr>
+                            <tr>
+                                <th>RCD</th>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                                <td><div class="matrix-cell matrix-na">-</div></td>
+                                <td><div class="matrix-cell matrix-fail">✗</div></td>
+                            </tr>
+                            <tr>
+                                <th>W</th>
+                                <td><div class="matrix-cell matrix-fail">✗</div></td>
+                                <td><div class="matrix-cell matrix-pass">✓</div></td>
+                                <td><div class="matrix-cell matrix-fail">✗</div></td>
+                                <td><div class="matrix-cell matrix-na">-</div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
+                        <div class="metric-value">8/12</div>
+                        <div class="metric-label">整合性チェック</div>
+                    </div>
+                    <div class="metric-card" style="background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);">
+                        <div class="metric-value">4</div>
+                        <div class="metric-label">不整合検出</div>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%); color: white; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                    <strong>⚠️ 整合性アラート</strong><br/>
+                    W事業部とSR/RCD事業部間でデータ不整合を検出。自動修復を推奨。
+                </div>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="card">
+                <h2>📋 詳細ログビューアー</h2>
+                
+                <div class="control-row">
+                    <div class="control-group">
+                        <label>ログレベル</label>
+                        <select id="log-level">
+                            <option value="all">全て表示</option>
+                            <option value="error">エラーのみ</option>
+                            <option value="warn">警告以上</option>
+                            <option value="info">情報以上</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>対象システム</label>
+                        <select id="log-system">
+                            <option value="all">全システム</option>
+                            <option value="sr">SR事業部</option>
+                            <option value="rc">RC事業部</option>
+                            <option value="rcd">RCD社</option>
+                            <option value="w">W事業部</option>
+                            <option value="integration">統合機能</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="log-viewer">
+                    <div class="log-content" id="log-content">
+                        <div class="log-entry log-info">[14:30:00] [SYSTEM] テストシステム起動</div>
+                        <div class="log-entry log-success">[14:30:15] [SR] データベース接続確立</div>
+                        <div class="log-entry log-success">[14:30:18] [RC] APIエンドポイント確認完了</div>
+                        <div class="log-entry log-warn">[14:30:22] [RCD] 外部業者システム応答遅延検出</div>
+                        <div class="log-entry log-error">[14:30:25] [W] 決済ゲートウェイ接続失敗</div>
+                        <div class="log-entry log-info">[14:30:30] [INTEGRATION] 統合データ同期開始</div>
+                        <div class="log-entry log-success">[14:30:35] [SR] AI予測モデル読み込み完了</div>
+                        <div class="log-entry log-warn">[14:30:40] [RCD] ゼロ化項目の一部未達成を検出</div>
+                        <div class="log-entry log-error">[14:30:45] [W] 季節性データ整合性エラー</div>
+                        <div class="log-entry log-info">[14:30:50] [INTEGRATION] 自動修復プロセス開始</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🛠️ 自動復旧・修復機能</h2>
+                
+                <div class="control-panel">
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label>復旧モード</label>
+                            <select id="recovery-mode">
+                                <option value="auto">自動復旧</option>
+                                <option value="manual">手動承認</option>
+                                <option value="disabled">復旧無効</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>復旧レベル</label>
+                            <select id="recovery-level">
+                                <option value="critical">緊急のみ</option>
+                                <option value="high">高優先度以上</option>
+                                <option value="all">全問題対応</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <button class="btn btn-success" onclick="startAutoRecovery()">自動復旧開始</button>
+                        <button class="btn btn-warning" onclick="manualRecovery()">手動復旧実行</button>
+                        <button class="btn" onclick="rollbackChanges()">変更をロールバック</button>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                    <h3 style="margin: 0 0 15px 0;">🔧 復旧アクション履歴</h3>
+                    <div>
+                        • 14:31:12 - W事業部決済システム再接続完了<br/>
+                        • 14:32:05 - RCD社データ整合性自動修復実行<br/>
+                        • 14:32:48 - SR事業部アラート機能再起動<br/>
+                        • 14:33:15 - 統合データ同期バッチ修復完了<br/>
+                        • 14:34:02 - W事業部季節性データ再計算実行
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
+                        <div class="metric-value">12</div>
+                        <div class="metric-label">自動修復成功</div>
+                    </div>
+                    <div class="metric-card" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);">
+                        <div class="metric-value">3</div>
+                        <div class="metric-label">手動対応要</div>
+                    </div>
+                    <div class="metric-card" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
+                        <div class="metric-value">98.2%</div>
+                        <div class="metric-label">復旧成功率</div>
+                    </div>
+                    <div class="metric-card" style="background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);">
+                        <div class="metric-value">2分15秒</div>
+                        <div class="metric-label">平均復旧時間</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2>📊 統合テスト結果サマリー</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">91.0%</div>
+                    <div class="metric-label">総合テスト成功率</div>
+                </div>
+                <div class="metric-card" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
+                    <div class="metric-value">8分32秒</div>
+                    <div class="metric-label">テスト実行時間</div>
+                </div>
+                <div class="metric-card" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
+                    <div class="metric-value">4/4</div>
+                    <div class="metric-label">事業部テスト完了</div>
+                </div>
+                <div class="metric-card" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);">
+                    <div class="metric-value">66.7%</div>
+                    <div class="metric-label">統合整合性</div>
+                </div>
+                <div class="metric-card" style="background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);">
+                    <div class="metric-value">3</div>
+                    <div class="metric-label">要対応項目</div>
+                </div>
+                <div class="metric-card" style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);">
+                    <div class="metric-value">98.2%</div>
+                    <div class="metric-label">システム稼働率</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testInterval;
+        let progressInterval;
+        let isTestRunning = false;
+
+        // テスト実行
+        function runTests() {
+            if (isTestRunning) return;
+            
+            isTestRunning = true;
+            document.getElementById('run-btn').disabled = true;
+            document.getElementById('stop-btn').disabled = false;
+            
+            const testSuite = document.getElementById('test-suite').value;
+            const testMode = document.getElementById('test-mode').value;
+            
+            addTestOutput(`running`, `テスト開始: ${testSuite} (${testMode}モード)`);
+            
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('test-progress').style.width = progress + '%';
+                document.getElementById('test-progress').textContent = Math.round(progress) + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    finishTest();
+                }
+            }, 500);
+            
+            // テストメッセージの生成
+            testInterval = setInterval(() => {
+                generateTestMessage();
+            }, 2000);
+        }
+
+        // テスト停止
+        function stopTests() {
+            isTestRunning = false;
+            clearInterval(testInterval);
+            clearInterval(progressInterval);
+            
+            document.getElementById('run-btn').disabled = false;
+            document.getElementById('stop-btn').disabled = true;
+            
+            addTestOutput('info', 'テスト実行を停止しました');
+        }
+
+        // テスト完了
+        function finishTest() {
+            isTestRunning = false;
+            clearInterval(testInterval);
+            
+            document.getElementById('run-btn').disabled = false;
+            document.getElementById('stop-btn').disabled = true;
+            
+            addTestOutput('pass', 'テストスイート実行完了');
+            updateTestStats();
+        }
+
+        // 緊急停止
+        function emergencyStop() {
+            stopTests();
+            addTestOutput('fail', '🚨 緊急停止が実行されました');
+            
+            // 全システムを安全状態に
+            setTimeout(() => {
+                addTestOutput('info', '全システムを安全状態に移行中...');
+                setTimeout(() => {
+                    addTestOutput('pass', '✅ 安全状態への移行完了');
+                }, 2000);
+            }, 1000);
+        }
+
+        // 結果クリア
+        function clearResults() {
+            document.getElementById('test-output').innerHTML = '';
+            document.getElementById('test-progress').style.width = '0%';
+            document.getElementById('test-progress').textContent = '0%';
+            addTestOutput('info', 'テスト結果をクリアしました');
+        }
+
+        // 自動復旧開始
+        function startAutoRecovery() {
+            addLogEntry('info', '[RECOVERY] 自動復旧プロセス開始');
+            
+            setTimeout(() => {
+                addLogEntry('success', '[RECOVERY] W事業部決済システム修復完了');
+                updateTestCard('w-test', 'pass');
+            }, 2000);
+            
+            setTimeout(() => {
+                addLogEntry('success', '[RECOVERY] データ整合性問題修復完了');
+                updateIntegrationMatrix();
+            }, 4000);
+        }
+
+        // 手動復旧実行
+        function manualRecovery() {
+            const confirmed = confirm('手動復旧を実行しますか？\n\n対象:\n- W事業部決済システム\n- RCD社外部連携\n- データ整合性問題');
+            
+            if (confirmed) {
+                addLogEntry('info', '[MANUAL] 手動復旧開始');
+                setTimeout(() => {
+                    addLogEntry('success', '[MANUAL] 手動復旧完了');
+                }, 3000);
+            }
+        }
+
+        // ロールバック
+        function rollbackChanges() {
+            const confirmed = confirm('最近の変更をロールバックしますか？');
+            
+            if (confirmed) {
+                addLogEntry('warn', '[ROLLBACK] システム状態をロールバック中...');
+                setTimeout(() => {
+                    addLogEntry('success', '[ROLLBACK] ロールバック完了');
+                }, 2000);
+            }
+        }
+
+        // テスト出力に追加
+        function addTestOutput(type, message) {
+            const output = document.getElementById('test-output');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ja-JP');
+            
+            const line = document.createElement('div');
+            line.className = `test-line ${type}`;
+            line.textContent = `[${timeString}] ${message}`;
+            
+            output.insertBefore(line, output.firstChild);
+            
+            // 最大20行まで表示
+            while (output.children.length > 20) {
+                output.removeChild(output.lastChild);
+            }
+        }
+
+        // ログエントリ追加
+        function addLogEntry(type, message) {
+            const logContent = document.getElementById('log-content');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ja-JP');
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${timeString}] ${message}`;
+            
+            logContent.insertBefore(entry, logContent.firstChild);
+            
+            // 最大30行まで表示
+            while (logContent.children.length > 30) {
+                logContent.removeChild(logContent.lastChild);
+            }
+        }
+
+        // テストメッセージ生成
+        function generateTestMessage() {
+            const systems = ['SR事業部', 'RC事業部', 'RCD社', 'W事業部'];
+            const tests = [
+                'データベース接続テスト',
+                'API応答確認',
+                'AI予測精度検証',
+                '統合データ同期',
+                'パフォーマンステスト',
+                'セキュリティチェック'
+            ];
+            
+            const system = systems[Math.floor(Math.random() * systems.length)];
+            const test = tests[Math.floor(Math.random() * tests.length)];
+            const success = Math.random() > 0.15; // 85%成功率
+            
+            const type = success ? 'pass' : 'fail';
+            const result = success ? '成功' : '失敗';
+            
+            addTestOutput(type, `${system}: ${test} - ${result}`);
+        }
+
+        // テスト統計更新
+        function updateTestStats() {
+            const passedTests = Math.floor(Math.random() * 10) + 140;
+            const failedTests = Math.floor(Math.random() * 5) + 1;
+            const totalTests = passedTests + failedTests + Math.floor(Math.random() * 15);
+            const successRate = ((passedTests / totalTests) * 100).toFixed(1);
+            
+            document.getElementById('passed-tests').textContent = passedTests;
+            document.getElementById('failed-tests').textContent = failedTests;
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        }
+
+        // テストカード更新
+        function updateTestCard(cardId, status) {
+            const card = document.getElementById(cardId);
+            card.className = `business-test-card ${status}`;
+        }
+
+        // 統合マトリックス更新
+        function updateIntegrationMatrix() {
+            // 実際の実装では、マトリックスの値を動的に更新
+            addLogEntry('success', '[INTEGRATION] 統合整合性マトリックス更新完了');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            addTestOutput('info', 'システム初期化完了');
+            addLogEntry('info', '[SYSTEM] 統合テストシステム起動完了');
+            
+            // 定期的なログ生成
+            setInterval(() => {
+                if (!isTestRunning) {
+                    const logTypes = ['info', 'success', 'warn'];
+                    const logType = logTypes[Math.floor(Math.random() * logTypes.length)];
+                    const messages = [
+                        '[MONITOR] システム状態監視中',
+                        '[HEALTH] ヘルスチェック実行',
+                        '[SYNC] データ同期確認',
+                        '[BACKUP] バックアップ処理完了'
+                    ];
+                    const message = messages[Math.floor(Math.random() * messages.length)];
+                    addLogEntry(logType, message);
+                }
+            }, 10000);
+        });
+    </script>
+</body>
+</html>

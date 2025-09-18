@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SR事業部 AI予測分析システム</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
+    <style>
+        body {
+            font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 100%);
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 18px;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        SR事業部 AI予測分析システム 読み込み中...
+    </div>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar, ResponsiveContainer, PieChart, Pie, Cell } = Recharts;
+        
+        // Lucide React アイコンの初期化
+        const Store = () => React.createElement('svg', {
+            width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2,
+            strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, [
+            React.createElement('path', { key: 1, d: 'M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z' }),
+            React.createElement('polyline', { key: 2, points: '3,9 21,9' })
+        ]);
+
+        const TrendingUp = () => React.createElement('svg', {
+            width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2,
+            strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, [
+            React.createElement('polyline', { key: 1, points: '22,7 13.5,15.5 8.5,10.5 2,17' }),
+            React.createElement('polyline', { key: 2, points: '16,7 22,7 22,13' })
+        ]);
+
+        const AlertTriangle = () => React.createElement('svg', {
+            width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2,
+            strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, [
+            React.createElement('path', { key: 1, d: 'M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z' }),
+            React.createElement('line', { key: 2, x1: '12', y1: '9', x2: '12', y2: '13' }),
+            React.createElement('line', { key: 3, x1: '12', y1: '17', x2: '12.01', y2: '17' })
+        ]);
+
+        const Target = () => React.createElement('svg', {
+            width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2,
+            strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, [
+            React.createElement('circle', { key: 1, cx: '12', cy: '12', r: '10' }),
+            React.createElement('circle', { key: 2, cx: '12', cy: '12', r: '6' }),
+            React.createElement('circle', { key: 3, cx: '12', cy: '12', r: '2' })
+        ]);
+
+        const MapPin = () => React.createElement('svg', {
+            width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2,
+            strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, [
+            React.createElement('path', { key: 1, d: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z' }),
+            React.createElement('circle', { key: 2, cx: '12', cy: '10', r: '3' })
+        ]);
+
+        const Brain = () => React.createElement('svg', {
+            width: 32, height: 32, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2,
+            strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, [
+            React.createElement('path', { key: 1, d: 'M12 2a3 3 0 0 0-3 3 4 4 0 0 0-4 4v6a4 4 0 0 0 4 4 3 3 0 0 0 3 3 3 3 0 0 0 3-3 4 4 0 0 0 4-4V9a4 4 0 0 0-4-4 3 3 0 0 0-3-3z' })
+        ]);
+
+        const SRPredictionSystem = () => {
+            const [selectedStore, setSelectedStore] = useState('全店舗統合');
+            const [predictionPeriod, setPredictionPeriod] = useState('6ヶ月');
+            const [analysisType, setAnalysisType] = useState('売上予測');
+            const [viewMode, setViewMode] = useState('予測グラフ');
+            const [isLoaded, setIsLoaded] = useState(false);
+
+            useEffect(() => {
+                // ページ読み込み完了
+                document.getElementById('loading').style.display = 'none';
+                setIsLoaded(true);
+            }, []);
+
+            // SR事業部6店舗データ
+            const storeData = {
+                '清水店': { 月売上: 89, 営業利益: 24, 利益率: 26.97, 人件費: 31, 特性: '観光客多・土日強' },
+                '静岡店': { 月売上: 95, 営業利益: 27, 利益率: 28.42, 人件費: 28, 特性: '安定顧客・平日強' },
+                '掛川店': { 月売上: 78, 営業利益: 21, 利益率: 26.92, 人件費: 25, 特性: '地域密着・夜間強' },
+                '市野店': { 月売上: 82, 営業利益: 23, 利益率: 28.05, 人件費: 24, 特性: '家族層・週末強' },
+                '伊豆長岡店': { 月売上: 71, 営業利益: 18, 利益率: 25.35, 人件費: 22, 特性: '温泉客・季節性強' },
+                '広島店': { 月売上: 110, 営業利益: 29, 利益率: 26.36, 人件費: 35, 特性: '都市部・通勤客強' }
+            };
+
+            // 過去12ヶ月の店舗別実績データ
+            const historicalStoreData = [
+                { month: '2024-01', 清水: 85, 静岡: 91, 掛川: 74, 市野: 78, 伊豆: 68, 広島: 105, 合計: 501 },
+                { month: '2024-02', 清水: 82, 静岡: 88, 掛川: 71, 市野: 75, 伊豆: 65, 広島: 102, 合計: 483 },
+                { month: '2024-03', 清水: 91, 静岡: 96, 掛川: 79, 市野: 83, 伊豆: 72, 広島: 108, 合計: 529 },
+                { month: '2024-04', 清水: 87, 静岡: 93, 掛川: 76, 市野: 80, 伊豆: 69, 広島: 106, 合計: 511 },
+                { month: '2024-05', 清水: 92, 静岡: 98, 掛川: 81, 市野: 85, 伊豆: 76, 広島: 112, 合計: 544 },
+                { month: '2024-06', 清水: 88, 静岡: 94, 掛川: 77, 市野: 81, 伊豆: 71, 広島: 109, 合計: 520 },
+                { month: '2024-07', 清水: 94, 静岡: 99, 掛川: 83, 市野: 87, 伊豆: 79, 広島: 115, 合計: 557 },
+                { month: '2024-08', 清水: 91, 静岡: 97, 掛川: 80, 市野: 84, 伊豆: 77, 広島: 113, 合計: 542 },
+                { month: '2024-09', 清水: 86, 静岡: 92, 掛川: 75, 市野: 79, 伊豆: 72, 広島: 107, 合計: 511 },
+                { month: '2024-10', 清水: 93, 静岡: 99, 掛川: 82, 市野: 86, 伊豆: 78, 広島: 116, 合計: 554 },
+                { month: '2024-11', 清水: 95, 静岡: 101, 掛川: 84, 市野: 88, 伊豆: 80, 広島: 118, 合計: 566 },
+                { month: '2024-12', 清水: 98, 静岡: 104, 掛川: 87, 市野: 91, 伊豆: 83, 広島: 121, 合計: 584 }
+            ];
+
+            // SR事業部特化型AI予測データ
+            const srPredictionData = [
+                { month: '2025-01', 予測売上: 567, 予測利益: 157, 信頼度: 89, 清水: 94, 静岡: 99, 掛川: 82, 市野: 86, 伊豆: 78, 広島: 114 },
+                { month: '2025-02', 予測売上: 548, 予測利益: 151, 信頼度: 87, 清水: 91, 静岡: 96, 掛川: 79, 市野: 83, 伊豆: 75, 広島: 110 },
+                { month: '2025-03', 予測売上: 592, 予測利益: 164, 信頼度: 91, 清水: 98, 静岡: 103, 掛川: 85, 市野: 89, 伊豆: 81, 広島: 118 },
+                { month: '2025-04', 予測売上: 576, 予測利益: 159, 信頼度: 88, 清水: 95, 静岡: 100, 掛川: 83, 市野: 87, 伊豆: 79, 広島: 115 },
+                { month: '2025-05', 予測売上: 601, 予測利益: 166, 信頼度: 92, 清水: 99, 静岡: 105, 掛川: 87, 市野: 91, 伊豆: 84, 広島: 121 },
+                { month: '2025-06', 予測売上: 584, 予測利益: 161, 信頼度: 89, 清水: 97, 静岡: 102, 掛川: 85, 市野: 89, 伊豆: 81, 広島: 118 }
+            ];
+
+            // SR事業部専用AIアラート
+            const srAlerts = [
+                { type: 'opportunity', store: '伊豆長岡店', message: '3-5月観光シーズン：予測売上+18%増加見込み（スタッフ増員推奨）', priority: '高' },
+                { type: 'risk', store: '広島店', message: '人件費上昇トレンド：来月+8%予測（効率化対策必要）', priority: '中' },
+                { type: 'trend', store: '全店統合', message: '土日売上比重増加：平日対策で年間+340万円増収可能', priority: '高' },
+                { type: 'maintenance', store: '掛川店', message: '設備更新時期：投資効果3年で回収見込み', priority: '中' }
+            ];
+
+            // 季節性・曜日パターン分析
+            const seasonalData = [
+                { period: '春期', 全店: 105, 観光店: 118, 市街地: 98, 傾向: '観光需要増' },
+                { period: '夏期', 全店: 98, 観光店: 112, 市街地: 92, 傾向: '夏休み効果' },
+                { period: '秋期', 全店: 102, 観光店: 95, 市街地: 106, 傾向: '安定期間' },
+                { period: '冬期', 全店: 95, 観光店: 85, 市街地: 104, 傾向: '年末年始波動' }
+            ];
+
+            const weeklyData = [
+                { day: '月', 売上指数: 85, 利益率: 26.2 },
+                { day: '火', 売上指数: 82, 利益率: 27.1 },
+                { day: '水', 売上指数: 88, 利益率: 27.8 },
+                { day: '木', 売上指数: 92, 利益率: 28.3 },
+                { day: '金', 売上指数: 108, 利益率: 29.1 },
+                { day: '土', 売上指数: 125, 利益率: 28.7 },
+                { day: '日', 売上指数: 120, 利益率: 27.9 }
+            ];
+
+            const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+
+            const storePerformanceData = Object.entries(storeData).map(([store, data], index) => ({
+                name: store.replace('店', ''),
+                売上: data.月売上,
+                利益: data.営業利益,
+                利益率: data.利益率,
+                人件費: data.人件費,
+                color: COLORS[index]
+            }));
+
+            if (!isLoaded) {
+                return React.createElement('div', { className: 'loading' }, 'システム読み込み中...');
+            }
+
+            return React.createElement('div', {
+                className: "max-w-7xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-green-50 min-h-screen"
+            }, [
+                // SR事業部専用ヘッダー
+                React.createElement('div', {
+                    key: 'header',
+                    className: "bg-white rounded-xl shadow-lg p-6 mb-6 border-l-4 border-green-500"
+                }, [
+                    React.createElement('div', {
+                        key: 'header-content',
+                        className: "flex items-center justify-between"
+                    }, [
+                        React.createElement('div', { key: 'header-left' }, [
+                            React.createElement('h1', {
+                                key: 'title',
+                                className: "text-3xl font-bold text-gray-800 flex items-center gap-3"
+                            }, [
+                                React.createElement(Store, { key: 'icon', className: "text-green-600" }),
+                                'SR事業部 AI予測分析システム'
+                            ]),
+                            React.createElement('p', {
+                                key: 'subtitle',
+                                className: "text-gray-600 mt-2"
+                            }, '6店舗統合管理・季節性対応・観光需要予測'),
+                            React.createElement('div', {
+                                key: 'badges',
+                                className: "flex items-center gap-4 mt-3 text-sm"
+                            }, [
+                                React.createElement('span', {
+                                    key: 'badge1',
+                                    className: "bg-green-100 text-green-800 px-3 py-1 rounded-full"
+                                }, '6店舗稼働中'),
+                                React.createElement('span', {
+                                    key: 'badge2',
+                                    className: "bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
+                                }, '年間売上: 5,101万円'),
+                                React.createElement('span', {
+                                    key: 'badge3',
+                                    className: "bg-purple-100 text-purple-800 px-3 py-1 rounded-full"
+                                }, '営業利益率: 27.73%')
+                            ])
+                        ]),
+                        React.createElement('div', {
+                            key: 'header-right',
+                            className: "text-right"
+                        }, [
+                            React.createElement('div', {
+                                key: 'label',
+                                className: "text-sm text-gray-500"
+                            }, '予測精度'),
+                            React.createElement('div', {
+                                key: 'value',
+                                className: "text-2xl font-bold text-green-600"
+                            }, '91.2%'),
+                            React.createElement('div', {
+                                key: 'note',
+                                className: "text-xs text-gray-400"
+                            }, 'SR事業部特化型AI')
+                        ])
+                    ])
+                ]),
+
+                // 制御パネル
+                React.createElement('div', {
+                    key: 'controls',
+                    className: "grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+                }, [
+                    React.createElement('div', {
+                        key: 'control1',
+                        className: "bg-white rounded-lg shadow p-4"
+                    }, [
+                        React.createElement('label', {
+                            key: 'label',
+                            className: "block text-sm font-medium text-gray-700 mb-2"
+                        }, '店舗選択'),
+                        React.createElement('select', {
+                            key: 'select',
+                            value: selectedStore,
+                            onChange: (e) => setSelectedStore(e.target.value),
+                            className: "w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        }, [
+                            React.createElement('option', { key: '全店舗統合', value: '全店舗統合' }, '全店舗統合'),
+                            React.createElement('option', { key: '清水店', value: '清水店' }, '清水店'),
+                            React.createElement('option', { key: '静岡店', value: '静岡店' }, '静岡店'),
+                            React.createElement('option', { key: '掛川店', value: '掛川店' }, '掛川店'),
+                            React.createElement('option', { key: '市野店', value: '市野店' }, '市野店'),
+                            React.createElement('option', { key: '伊豆長岡店', value: '伊豆長岡店' }, '伊豆長岡店'),
+                            React.createElement('option', { key: '広島店', value: '広島店' }, '広島店')
+                        ])
+                    ]),
+                    React.createElement('div', {
+                        key: 'control2',
+                        className: "bg-white rounded-lg shadow p-4"
+                    }, [
+                        React.createElement('label', {
+                            key: 'label',
+                            className: "block text-sm font-medium text-gray-700 mb-2"
+                        }, '分析期間'),
+                        React.createElement('select', {
+                            key: 'select',
+                            value: predictionPeriod,
+                            onChange: (e) => setPredictionPeriod(e.target.value),
+                            className: "w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        }, [
+                            React.createElement('option', { key: '3ヶ月', value: '3ヶ月' }, '3ヶ月予測'),
+                            React.createElement('option', { key: '6ヶ月', value: '6ヶ月' }, '6ヶ月予測'),
+                            React.createElement('option', { key: '12ヶ月', value: '12ヶ月' }, '年間予測')
+                        ])
+                    ]),
+                    React.createElement('div', {
+                        key: 'control3',
+                        className: "bg-white rounded-lg shadow p-4"
+                    }, [
+                        React.createElement('label', {
+                            key: 'label',
+                            className: "block text-sm font-medium text-gray-700 mb-2"
+                        }, '分析種別'),
+                        React.createElement('select', {
+                            key: 'select',
+                            value: analysisType,
+                            onChange: (e) => setAnalysisType(e.target.value),
+                            className: "w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        }, [
+                            React.createElement('option', { key: '売上予測', value: '売上予測' }, '売上予測'),
+                            React.createElement('option', { key: '利益予測', value: '利益予測' }, '利益予測'),
+                            React.createElement('option', { key: '季節性分析', value: '季節性分析' }, '季節性分析'),
+                            React.createElement('option', { key: '店舗比較', value: '店舗比較' }, '店舗比較分析')
+                        ])
+                    ]),
+                    React.createElement('div', {
+                        key: 'control4',
+                        className: "bg-white rounded-lg shadow p-4"
+                    }, [
+                        React.createElement('label', {
+                            key: 'label',
+                            className: "block text-sm font-medium text-gray-700 mb-2"
+                        }, '表示モード'),
+                        React.createElement('select', {
+                            key: 'select',
+                            value: viewMode,
+                            onChange: (e) => setViewMode(e.target.value),
+                            className: "w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        }, [
+                            React.createElement('option', { key: '予測グラフ', value: '予測グラフ' }, '予測グラフ'),
+                            React.createElement('option', { key: '店舗分析', value: '店舗分析' }, '店舗分析'),
+                            React.createElement('option', { key: 'パターン分析', value: 'パターン分析' }, 'パターン分析')
+                        ])
+                    ])
+                ]),
+
+                // SR事業部専用アラートシステム
+                React.createElement('div', {
+                    key: 'alerts',
+                    className: "bg-white rounded-xl shadow-lg p-6 mb-6"
+                }, [
+                    React.createElement('h2', {
+                        key: 'title',
+                        className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"
+                    }, [
+                        React.createElement(AlertTriangle, { key: 'icon', className: "text-orange-500" }),
+                        'SR事業部 AIアラート・推奨アクション'
+                    ]),
+                    React.createElement('div', {
+                        key: 'content',
+                        className: "grid grid-cols-1 md:grid-cols-2 gap-4"
+                    }, srAlerts.map((alert, index) =>
+                        React.createElement('div', {
+                            key: index,
+                            className: "border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                        }, [
+                            React.createElement('div', {
+                                key: 'alert-content',
+                                className: "flex items-start gap-3"
+                            }, [
+                                React.createElement('div', {
+                                    key: 'dot',
+                                    className: `w-3 h-3 rounded-full mt-2 ${
+                                        alert.type === 'risk' ? 'bg-red-500' :
+                                        alert.type === 'opportunity' ? 'bg-green-500' :
+                                        alert.type === 'trend' ? 'bg-blue-500' : 'bg-yellow-500'
+                                    }`
+                                }),
+                                React.createElement('div', {
+                                    key: 'text',
+                                    className: "flex-1"
+                                }, [
+                                    React.createElement('div', {
+                                        key: 'header',
+                                        className: "flex items-center gap-2 mb-1"
+                                    }, [
+                                        React.createElement('span', {
+                                            key: 'store',
+                                            className: "text-sm font-medium text-gray-600"
+                                        }, alert.store),
+                                        React.createElement('span', {
+                                            key: 'priority',
+                                            className: `text-xs px-2 py-1 rounded ${
+                                                alert.priority === '高' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                                            }`
+                                        }, `優先度: ${alert.priority}`)
+                                    ]),
+                                    React.createElement('p', {
+                                        key: 'message',
+                                        className: "text-sm text-gray-700"
+                                    }, alert.message)
+                                ])
+                            ])
+                        ])
+                    ))
+                ]),
+
+                // 予測グラフ
+                viewMode === '予測グラフ' && React.createElement('div', {
+                    key: 'prediction-chart',
+                    className: "bg-white rounded-xl shadow-lg p-6 mb-6"
+                }, [
+                    React.createElement('h2', {
+                        key: 'title',
+                        className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"
+                    }, [
+                        React.createElement(TrendingUp, { key: 'icon', className: "text-green-600" }),
+                        `SR事業部 ${predictionPeriod}予測トレンド`
+                    ]),
+                    React.createElement('div', {
+                        key: 'chart',
+                        style: { width: '100%', height: '400px' }
+                    }, [
+                        React.createElement(ResponsiveContainer, {
+                            key: 'container',
+                            width: "100%",
+                            height: "100%"
+                        }, [
+                            React.createElement(LineChart, {
+                                key: 'linechart',
+                                data: srPredictionData
+                            }, [
+                                React.createElement(CartesianGrid, { key: 'grid', strokeDasharray: "3 3" }),
+                                React.createElement(XAxis, { key: 'xaxis', dataKey: "month" }),
+                                React.createElement(YAxis, { key: 'yaxis1', yAxisId: "left" }),
+                                React.createElement(YAxis, { key: 'yaxis2', yAxisId: "right", orientation: "right" }),
+                                React.createElement(Tooltip, {
+                                    key: 'tooltip',
+                                    formatter: (value, name) => [
+                                        `${value}万円`,
+                                        name === '予測売上' ? '予測売上' : '予測利益'
+                                    ]
+                                }),
+                                React.createElement(Legend, { key: 'legend' }),
+                                React.createElement(Line, {
+                                    key: 'line1',
+                                    yAxisId: "left",
+                                    type: "monotone",
+                                    dataKey: "予測売上",
+                                    stroke: "#16a34a",
+                                    strokeWidth: 3,
+                                    dot: { fill: '#16a34a', r: 6 }
+                                }),
+                                React.createElement(Line, {
+                                    key: 'line2',
+                                    yAxisId: "right",
+                                    type: "monotone",
+                                    dataKey: "予測利益",
+                                    stroke: "#2563eb",
+                                    strokeWidth: 2,
+                                    dot: { fill: '#2563eb', r: 4 }
+                                })
+                            ])
+                        ])
+                    ])
+                ]),
+
+                // 店舗別詳細分析カード
+                React.createElement('div', {
+                    key: 'store-cards',
+                    className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
+                }, Object.entries(storeData).map(([storeName, data], index) =>
+                    React.createElement('div', {
+                        key: storeName,
+                        className: "bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                    }, [
+                        React.createElement('div', {
+                            key: 'header',
+                            className: "flex items-center justify-between mb-3"
+                        }, [
+                            React.createElement('h3', {
+                                key: 'name',
+                                className: "text-lg font-bold text-gray-800 flex items-center gap-2"
+                            }, [
+                                React.createElement(MapPin, { key: 'icon', className: "text-green-600" }),
+                                storeName
+                            ]),
+                            React.createElement('span', {
+                                key: 'status',
+                                className: `text-xs px-2 py-1 rounded-full ${
+                                    data.利益率 > 27 ? 'bg-green-100 text-green-700' : 
+                                    data.利益率 > 26 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                                }`
+                            }, data.利益率 > 27 ? '優秀' : data.利益率 > 26 ? '標準' : '要改善')
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'metrics',
+                            className: "space-y-2 mb-4"
+                        }, [
+                            React.createElement('div', {
+                                key: 'sales',
+                                className: "flex justify-between"
+                            }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "text-gray-600"
+                                }, '月間売上'),
+                                React.createElement('span', {
+                                    key: 'value',
+                                    className: "font-semibold text-green-600"
+                                }, `${data.月売上}万円`)
+                            ]),
+                            React.createElement('div', {
+                                key: 'profit',
+                                className: "flex justify-between"
+                            }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "text-gray-600"
+                                }, '営業利益'),
+                                React.createElement('span', {
+                                    key: 'value',
+                                    className: "font-semibold text-blue-600"
+                                }, `${data.営業利益}万円`)
+                            ]),
+                            React.createElement('div', {
+                                key: 'rate',
+                                className: "flex justify-between"
+                            }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "text-gray-600"
+                                }, '利益率'),
+                                React.createElement('span', {
+                                    key: 'value',
+                                    className: "font-semibold text-purple-600"
+                                }, `${data.利益率}%`)
+                            ]),
+                            React.createElement('div', {
+                                key: 'cost',
+                                className: "flex justify-between"
+                            }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "text-gray-600"
+                                }, '人件費'),
+                                React.createElement('span', {
+                                    key: 'value',
+                                    className: "font-semibold text-orange-600"
+                                }, `${data.人件費}万円`)
+                            ])
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'characteristics',
+                            className: "border-t pt-3"
+                        }, [
+                            React.createElement('div', {
+                                key: 'label',
+                                className: "text-sm text-gray-600 mb-2"
+                            }, '店舗特性'),
+                            React.createElement('div', {
+                                key: 'value',
+                                className: "text-sm text-gray-800"
+                            }, data.特性)
+                        ])
+                    ])
+                )),
+
+                // SR事業部サマリー・推奨アクション
+                React.createElement('div', {
+                    key: 'summary',
+                    className: "bg-gradient-to-r from-green-100 to-blue-100 rounded-xl shadow-lg p-6"
+                }, [
+                    React.createElement('h2', {
+                        key: 'title',
+                        className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"
+                    }, [
+                        React.createElement(Target, { key: 'icon', className: "text-green-600" }),
+                        'SR事業部 AI分析サマリー・次のアクション'
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'metrics',
+                        className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"
+                    }, [
+                        React.createElement('div', {
+                            key: 'metric1',
+                            className: "text-center"
+                        }, [
+                            React.createElement('div', {
+                                key: 'value',
+                                className: "text-2xl font-bold text-green-600 mb-1"
+                            }, '5,234万円'),
+                            React.createElement('div', {
+                                key: 'label',
+                                className: "text-sm text-gray-600"
+                            }, '年間売上予測'),
+                            React.createElement('div', {
+                                key: 'growth',
+                                className: "text-xs text-green-500"
+                            }, '+2.6%成長')
+                        ]),
+                        React.createElement('div', {
+                            key: 'metric2',
+                            className: "text-center"
+                        }, [
+                            React.createElement('div', {
+                                key: 'value',
+                                className: "text-2xl font-bold text-blue-600 mb-1"
+                            }, '1,448万円'),
+                            React.createElement('div', {
+                                key: 'label',
+                                className: "text-sm text-gray-600"
+                            }, '年間利益予測'),
+                            React.createElement('div', {
+                                key: 'rate',
+                                className: "text-xs text-blue-500"
+                            }, '27.67%利益率')
+                        ]),
+                        React.createElement('div', {
+                            key: 'metric3',
+                            className: "text-center"
+                        }, [
+                            React.createElement('div', {
+                                key: 'value',
+                                className: "text-2xl font-bold text-purple-600 mb-1"
+                            }, '340万円'),
+                            React.createElement('div', {
+                                key: 'label',
+                                className: "text-sm text-gray-600"
+                            }, '改善余地'),
+                            React.createElement('div', {
+                                key: 'note',
+                                className: "text-xs text-purple-500"
+                            }, '平日対策で実現')
+                        ]),
+                        React.createElement('div', {
+                            key: 'metric4',
+                            className: "text-center"
+                        }, [
+                            React.createElement('div', {
+                                key: 'value',
+                                className: "text-2xl font-bold text-orange-600 mb-1"
+                            }, '中リスク'),
+                            React.createElement('div', {
+                                key: 'label',
+                                className: "text-sm text-gray-600"
+                            }, '季節性リスク'),
+                            React.createElement('div', {
+                                key: 'note',
+                                className: "text-xs text-orange-500"
+                            }, '対策実装中')
+                        ])
+                    ]),
+
+                    React.createElement('div', {
+                        key: 'actions',
+                        className: "bg-white bg-opacity-70 rounded-lg p-4"
+                    }, [
+                        React.createElement('h3', {
+                            key: 'title',
+                            className: "font-bold text-gray-800 mb-2"
+                        }, '今月の優先アクション:'),
+                        React.createElement('div', {
+                            key: 'content',
+                            className: "grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
+                        }, [
+                            React.createElement('div', { key: 'action1' }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "font-medium text-green-700"
+                                }, '• 伊豆長岡店:'),
+                                React.createElement('span', {
+                                    key: 'text',
+                                    className: "text-gray-700"
+                                }, ' 観光シーズン対応スタッフ増員')
+                            ]),
+                            React.createElement('div', { key: 'action2' }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "font-medium text-blue-700"
+                                }, '• 広島店:'),
+                                React.createElement('span', {
+                                    key: 'text',
+                                    className: "text-gray-700"
+                                }, ' 人件費効率化・シフト最適化')
+                            ]),
+                            React.createElement('div', { key: 'action3' }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "font-medium text-purple-700"
+                                }, '• 全店:'),
+                                React.createElement('span', {
+                                    key: 'text',
+                                    className: "text-gray-700"
+                                }, ' 平日集客強化施策実装')
+                            ]),
+                            React.createElement('div', { key: 'action4' }, [
+                                React.createElement('span', {
+                                    key: 'label',
+                                    className: "font-medium text-orange-700"
+                                }, '• 掛川店:'),
+                                React.createElement('span', {
+                                    key: 'text',
+                                    className: "text-gray-700"
+                                }, ' 設備更新投資検討開始')
+                            ])
+                        ])
+                    ])
+                ])
+            ]);
+        };
+
+        // システム起動
+        ReactDOM.render(React.createElement(SRPredictionSystem), document.getElementById('root'));
+    </script>
+</body>
+</html>

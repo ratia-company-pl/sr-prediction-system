@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4事業部統合ダッシュボードシステム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            color: white;
+        }
+
+        .header-stat {
+            text-align: center;
+        }
+
+        .header-stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .header-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .wide-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-active {
+            background: #00b894;
+        }
+
+        .status-warning {
+            background: #fdcb6e;
+        }
+
+        .status-error {
+            background: #e84393;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-box:hover {
+            transform: scale(1.05);
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .business-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .business-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .business-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .business-card.sr { border-left-color: #00b894; }
+        .business-card.rc { border-left-color: #74b9ff; }
+        .business-card.rcd { border-left-color: #fd79a8; }
+        .business-card.w { border-left-color: #fdcb6e; }
+
+        .business-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .business-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .business-metric {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            height: 200px;
+            position: relative;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: end;
+            height: 120px;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .chart-bar {
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 4px;
+            flex: 1;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            transform: scaleY(1.05);
+            background: linear-gradient(180deg, #74b9ff, #0984e3);
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .alert-panel {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .alert-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fd79a8;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .performance-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .performance-title {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .performance-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .performance-trend {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .trend-positive {
+            color: #00b894;
+        }
+
+        .trend-negative {
+            color: #e84393;
+        }
+
+        .real-time-data {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .data-stream {
+            height: 150px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .data-entry {
+            margin: 3px 0;
+            padding: 3px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+
+        .data-entry.success {
+            background: rgba(0, 184, 148, 0.2);
+        }
+
+        .data-entry.warning {
+            background: rgba(253, 203, 110, 0.2);
+        }
+
+        .data-entry.info {
+            background: rgba(116, 185, 255, 0.2);
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .control-group {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #333;
+            min-width: 100px;
+        }
+
+        .control-group select, .control-group input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .control-group select:focus, .control-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+        .summary-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .summary-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-metric {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .summary-metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .summary-metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .wide-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .business-overview {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .header-stats {
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .business-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>🎯 4事業部統合ダッシュボード</h1>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value" id="total-revenue">212,157万円</div>
+                    <div class="header-stat-label">総売上</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value" id="efficiency-rate">91.2%</div>
+                    <div class="header-stat-label">総合効率</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value" id="system-uptime">99.9%</div>
+                    <div class="header-stat-label">稼働率</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value" id="current-time"></div>
+                    <div class="header-stat-label">更新時刻</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="summary-panel">
+            <div class="summary-title">📊 統合経営指標</div>
+            <div class="summary-metrics">
+                <div class="summary-metric">
+                    <div class="summary-metric-value">+874万円</div>
+                    <div class="summary-metric-label">年間改善効果</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-metric-value">89.8%</div>
+                    <div class="summary-metric-label">平均AI精度</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-metric-value">4/4</div>
+                    <div class="summary-metric-label">稼働事業部</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-metric-value">100%</div>
+                    <div class="summary-metric-label">目標達成率</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2>🏢 事業部別パフォーマンス概要</h2>
+            <div class="business-overview">
+                <div class="business-card sr">
+                    <div class="business-name">SR事業部</div>
+                    <div class="business-metrics">
+                        <div class="business-metric">
+                            <span>売上:</span>
+                            <span>5,101万円</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>利益率:</span>
+                            <span>27.73%</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>AI精度:</span>
+                            <span>91.2%</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>状態:</span>
+                            <span style="color: #00b894;">稼働中</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="business-card rc">
+                    <div class="business-name">RC事業部</div>
+                    <div class="business-metrics">
+                        <div class="business-metric">
+                            <span>売上:</span>
+                            <span>2,847万円</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>ROI:</span>
+                            <span>183.0%</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>精度:</span>
+                            <span>88.7%</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>状態:</span>
+                            <span style="color: #00b894;">稼働中</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="business-card rcd">
+                    <div class="business-name">RCD社</div>
+                    <div class="business-metrics">
+                        <div class="business-metric">
+                            <span>効率性:</span>
+                            <span>89.4%</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>削減:</span>
+                            <span>125万円/月</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>ゼロ化:</span>
+                            <span>5/8項目</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>状態:</span>
+                            <span style="color: #00b894;">稼働中</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="business-card w">
+                    <div class="business-name">W事業部</div>
+                    <div class="business-metrics">
+                        <div class="business-metric">
+                            <span>段階:</span>
+                            <span>第7段階</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>削減率:</span>
+                            <span>13.4%</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>季節性:</span>
+                            <span>91.8%</span>
+                        </div>
+                        <div class="business-metric">
+                            <span>状態:</span>
+                            <span style="color: #00b894;">稼働中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wide-grid">
+            <div class="card">
+                <h2><span class="status-indicator status-active"></span>リアルタイム統合分析</h2>
+                
+                <div class="chart-container">
+                    <h3>月次売上トレンド（全事業部統合）</h3>
+                    <div class="chart-bars">
+                        <div class="chart-bar" style="height: 60%;">
+                            <div class="chart-bar-value">8,450万</div>
+                            <div class="chart-bar-label">1月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 45%;">
+                            <div class="chart-bar-value">7,200万</div>
+                            <div class="chart-bar-label">2月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 75%;">
+                            <div class="chart-bar-value">9,680万</div>
+                            <div class="chart-bar-label">3月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 85%;">
+                            <div class="chart-bar-value">10,950万</div>
+                            <div class="chart-bar-label">4月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 95%;">
+                            <div class="chart-bar-value">12,180万</div>
+                            <div class="chart-bar-label">5月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 70%;">
+                            <div class="chart-bar-value">8,950万</div>
+                            <div class="chart-bar-label">6月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 55%;">
+                            <div class="chart-bar-value">7,680万</div>
+                            <div class="chart-bar-label">7月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 50%;">
+                            <div class="chart-bar-value">7,350万</div>
+                            <div class="chart-bar-label">8月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 80%;">
+                            <div class="chart-bar-value">10,250万</div>
+                            <div class="chart-bar-label">9月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 90%;">
+                            <div class="chart-bar-value">11,480万</div>
+                            <div class="chart-bar-label">10月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 100%;">
+                            <div class="chart-bar-value">12,850万</div>
+                            <div class="chart-bar-label">11月</div>
+                        </div>
+                        <div class="chart-bar" style="height: 105%;">
+                            <div class="chart-bar-value">13,420万</div>
+                            <div class="chart-bar-label">12月</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="performance-grid">
+                    <div class="performance-card">
+                        <div class="performance-title">今月売上</div>
+                        <div class="performance-value">10,250万円</div>
+                        <div class="performance-trend trend-positive">+12.3% vs 前月</div>
+                    </div>
+                    <div class="performance-card">
+                        <div class="performance-title">目標達成率</div>
+                        <div class="performance-value">108.5%</div>
+                        <div class="performance-trend trend-positive">+8.5% vs 目標</div>
+                    </div>
+                    <div class="performance-card">
+                        <div class="performance-title">利益率</div>
+                        <div class="performance-value">24.8%</div>
+                        <div class="performance-trend trend-positive">+2.1% vs 前月</div>
+                    </div>
+                    <div class="performance-card">
+                        <div class="performance-title">効率性指標</div>
+                        <div class="performance-value">91.2%</div>
+                        <div class="performance-trend trend-positive">+1.8% vs 前月</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span class="status-indicator status-warning"></span>アラート・推奨アクション</h2>
+                
+                <div class="alert-panel">
+                    <h3>🚨 緊急アラート</h3>
+                    <div class="alert-item">
+                        <div class="alert-icon">!</div>
+                        <div>
+                            <strong>RCD社:</strong> 委託業務2件未解決 - 即座対応要
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon">⚠</div>
+                        <div>
+                            <strong>W事業部:</strong> 決済手数料上昇傾向 - 最適化推奨
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert-panel" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
+                    <h3>💡 AI推奨アクション</h3>
+                    <div class="alert-item">
+                        <div class="alert-icon">🎯</div>
+                        <div>
+                            <strong>SR事業部:</strong> 伊豆長岡店効率改善で+45万円見込み
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon">📈</div>
+                        <div>
+                            <strong>RC事業部:</strong> 5月BWJ投資拡大で+280万円効果予測
+                        </div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-icon">🔧</div>
+                        <div>
+                            <strong>統合:</strong> 事業部間リソース最適化で+8.5%向上
+                        </div>
+                    </div>
+                </div>
+
+                <div class="real-time-data">
+                    <h3>📡 リアルタイムデータストリーム</h3>
+                    <div class="data-stream" id="data-stream">
+                        <div class="data-entry success">[15:42:33] SR事業部: AI予測精度更新 91.3%</div>
+                        <div class="data-entry info">[15:42:15] RC事業部: ROI計算完了 184.2%</div>
+                        <div class="data-entry success">[15:41:58] W事業部: 季節性分析更新</div>
+                        <div class="data-entry warning">[15:41:45] RCD社: アラート - 品質問題検出</div>
+                        <div class="data-entry info">[15:41:30] 統合: 月次レポート生成開始</div>
+                        <div class="data-entry success">[15:41:12] システム: 稼働率更新 99.9%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>⚙️ システム制御パネル</h2>
+                
+                <div class="control-panel">
+                    <div class="control-group">
+                        <label>更新間隔:</label>
+                        <select id="update-interval">
+                            <option value="5">5秒</option>
+                            <option value="30" selected>30秒</option>
+                            <option value="60">1分</option>
+                            <option value="300">5分</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>表示期間:</label>
+                        <select id="display-period">
+                            <option value="today">今日</option>
+                            <option value="week">今週</option>
+                            <option value="month" selected>今月</option>
+                            <option value="quarter">四半期</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>アラート設定:</label>
+                        <select id="alert-level">
+                            <option value="critical">緊急のみ</option>
+                            <option value="high" selected>高優先度以上</option>
+                            <option value="all">全て</option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button class="btn" onclick="refreshDashboard()">手動更新</button>
+                        <button class="btn btn-secondary" onclick="exportReport()">レポート出力</button>
+                    </div>
+                </div>
+
+                <div class="metrics-row">
+                    <div class="metric-box" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
+                        <div class="metric-value">4</div>
+                        <div class="metric-label">稼働システム</div>
+                    </div>
+                    <div class="metric-box" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
+                        <div class="metric-value">0</div>
+                        <div class="metric-label">エラー件数</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 KPI追跡</h2>
+                
+                <div class="metrics-row">
+                    <div class="metric-box">
+                        <div class="metric-value">27.73%</div>
+                        <div class="metric-label">平均利益率</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-value">91.2%</div>
+                        <div class="metric-label">目標達成率</div>
+                    </div>
+                </div>
+
+                <div class="chart-container" style="height: 150px;">
+                    <h3>効率性トレンド</h3>
+                    <div style="display: flex; align-items: end; height: 80px; gap: 8px; margin-top: 20px;">
+                        <div style="background: #667eea; height: 60%; flex: 1; border-radius: 3px;"></div>
+                        <div style="background: #667eea; height: 70%; flex: 1; border-radius: 3px;"></div>
+                        <div style="background: #667eea; height: 65%; flex: 1; border-radius: 3px;"></div>
+                        <div style="background: #667eea; height: 80%; flex: 1; border-radius: 3px;"></div>
+                        <div style="background: #667eea; height: 85%; flex: 1; border-radius: 3px;"></div>
+                        <div style="background: #00b894; height: 90%; flex: 1; border-radius: 3px;"></div>
+                        <div style="background: #00b894; height: 95%; flex: 1; border-radius: 3px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🎯 目標vs実績</h2>
+                
+                <div style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>売上目標達成</span>
+                        <span>108.5%</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #00b894, #00cec9); height: 100%; width: 108.5%; border-radius: 6px;"></div>
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>利益率目標</span>
+                        <span>112.3%</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #74b9ff, #0984e3); height: 100%; width: 112.3%; border-radius: 6px;"></div>
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>効率性目標</span>
+                        <span>95.8%</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 12px; border-radius: 6px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #fdcb6e, #f39c12); height: 100%; width: 95.8%; border-radius: 6px;"></div>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 15px; border-radius: 10px; margin-top: 20px; color: #333;">
+                    <strong>🏆 総合評価: A+</strong><br/>
+                    全目標を上回る優秀な実績
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 現在時刻の表示
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ja-JP', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        // データストリームの更新
+        function updateDataStream() {
+            const dataStream = document.getElementById('data-stream');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ja-JP');
+            
+            const messages = [
+                { type: 'success', msg: 'SR事業部: 売上データ更新完了' },
+                { type: 'info', msg: 'RC事業部: ROI再計算実行' },
+                { type: 'success', msg: 'W事業部: 人件費最適化完了' },
+                { type: 'warning', msg: 'RCD社: 効率性監視中' },
+                { type: 'info', msg: '統合: KPI計算更新' },
+                { type: 'success', msg: 'システム: ヘルスチェック完了' }
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            const newEntry = document.createElement('div');
+            newEntry.className = `data-entry ${randomMessage.type}`;
+            newEntry.textContent = `[${timeString}] ${randomMessage.msg}`;
+            
+            dataStream.insertBefore(newEntry, dataStream.firstChild);
+            
+            // 最大10件まで表示
+            while (dataStream.children.length > 10) {
+                dataStream.removeChild(dataStream.lastChild);
+            }
+        }
+
+        // メトリクスの微調整更新
+        function updateMetrics() {
+            // 効率率を微調整
+            const efficiencyElement = document.getElementById('efficiency-rate');
+            const currentEfficiency = parseFloat(efficiencyElement.textContent);
+            const variation = (Math.random() - 0.5) * 0.4; // ±0.2%
+            const newEfficiency = Math.max(90, Math.min(95, currentEfficiency + variation));
+            efficiencyElement.textContent = newEfficiency.toFixed(1) + '%';
+        }
+
+        // ダッシュボードの手動更新
+        function refreshDashboard() {
+            updateTime();
+            updateDataStream();
+            updateMetrics();
+            
+            // 更新アニメーション
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.transform = 'scale(1)';
+                }, 100);
+            });
+        }
+
+        // レポート出力
+        function exportReport() {
+            alert('📊 統合レポートを生成中...\n\n含まれる内容:\n• 4事業部統合分析\n• KPI達成状況\n• AI予測結果\n• 改善提案');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            
+            // 定期更新の設定
+            setInterval(updateTime, 1000);
+            setInterval(updateDataStream, 15000);
+            setInterval(updateMetrics, 60000);
+            
+            // チャートバーのアニメーション
+            setTimeout(() => {
+                const chartBars = document.querySelectorAll('.chart-bar');
+                chartBars.forEach((bar, index) => {
+                    const height = bar.style.height;
+                    bar.style.height = '0%';
+                    setTimeout(() => {
+                        bar.style.transition = 'height 0.8s ease';
+                        bar.style.height = height;
+                    }, index * 100);
+                });
+            }, 500);
+
+            // カードの順次表示アニメーション
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // 更新間隔の変更
+        document.getElementById('update-interval')?.addEventListener('change', function() {
+            const interval = parseInt(this.value) * 1000;
+            // 実際の実装では、ここで更新間隔を変更
+            console.log(`更新間隔を${this.value}秒に変更`);
+        });
+    </script>
+</body>
+</html>

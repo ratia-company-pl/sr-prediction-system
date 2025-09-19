@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3-3: 経営意思決定支援システム - 4事業部統合PLマスターシステム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header .subtitle {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .status-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge-completed {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .badge-current {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4f46e5;
+            padding-left: 12px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4f46e5;
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 5px;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .resource-optimizer {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .optimizer-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .control-group {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .slider-container {
+            margin: 10px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .value-display {
+            text-align: center;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-top: 5px;
+        }
+
+        .optimize-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .optimize-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .result-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .result-card.optimal {
+            border-color: #48bb78;
+            background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+        }
+
+        .result-card h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .investment-analyzer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .investment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .investment-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .investment-card:hover {
+            border-color: #4f46e5;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .priority-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .priority-high {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        .priority-low {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .risk-matrix {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            margin: 20px 0;
+            background: #e2e8f0;
+            padding: 2px;
+            border-radius: 8px;
+        }
+
+        .matrix-cell {
+            background: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .risk-low {
+            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+            color: #22543d;
+        }
+
+        .risk-medium {
+            background: linear-gradient(135deg, #fed7c3, #fbb6ce);
+            color: #744210;
+        }
+
+        .risk-high {
+            background: linear-gradient(135deg, #fed7d7, #fbb6b6);
+            color: #742a2a;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+            color: white;
+            box-shadow: 0 4px 15px rgba(113, 128, 150, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-running {
+            background: #48bb78;
+            animation: pulse-green 1.5s infinite;
+        }
+
+        .status-analyzing {
+            background: #ed8936;
+            animation: pulse-orange 1.5s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .optimizer-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .investment-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .matrix-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 80%;
+                max-width: 300px;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #48bb78;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Phase 3-3: 経営意思決定支援システム</h1>
+            <div class="subtitle">リソース配分最適化・投資優先度算出・リスク評価</div>
+            <div class="status-badges">
+                <span class="badge badge-completed">Phase 3-1 完了</span>
+                <span class="badge badge-completed">Phase 3-2 完了</span>
+                <span class="badge badge-current">Phase 3-3 実装中</span>
+            </div>
+        </div>
+
+        <!-- KPI概要 -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value" id="total-revenue">212,157</div>
+                <div class="kpi-label">統合売上（万円）</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" id="total-profit">5,763</div>
+                <div class="kpi-label">統合営業利益（万円）</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" id="prediction-accuracy">95.2%</div>
+                <div class="kpi-label">AI予測精度</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value" id="system-uptime">99.9%</div>
+                <div class="kpi-label">システム稼働率</div>
+            </div>
+        </div>
+
+        <!-- リソース配分最適化システム -->
+        <div class="resource-optimizer">
+            <h2>🔧 事業部間リソース配分最適化</h2>
+            <p>AIアルゴリズムによる人材・予算・設備の最適配分を実行します</p>
+            
+            <div class="optimizer-controls">
+                <div class="control-group">
+                    <label>SR事業部 人員配分</label>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="sr-staff" min="10" max="50" value="25">
+                        <div class="value-display" id="sr-staff-value">25人</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>RC事業部 予算配分</label>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="rc-budget" min="500" max="3000" value="1500">
+                        <div class="value-display" id="rc-budget-value">1,500万円</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>W事業部 設備投資</label>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="w-equipment" min="200" max="2000" value="800">
+                        <div class="value-display" id="w-equipment-value">800万円</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>RCD事業部 R&D予算</label>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="rcd-rd" min="300" max="1500" value="650">
+                        <div class="value-display" id="rcd-rd-value">650万円</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="optimize-btn" onclick="optimizeResources()">
+                    <span class="status-indicator status-analyzing"></span>
+                    AI最適化実行
+                </button>
+            </div>
+
+            <div class="results-grid" id="optimization-results" style="display: none;">
+                <div class="result-card optimal">
+                    <h3>🏆 最適配分案</h3>
+                    <div class="metric-row">
+                        <span>期待ROI:</span>
+                        <strong>247%</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>効率性向上:</span>
+                        <strong>+15.2%</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>リスクレベル:</span>
+                        <strong>低</strong>
+                    </div>
+                </div>
+                <div class="result-card">
+                    <h3>📊 現在配分</h3>
+                    <div class="metric-row">
+                        <span>現在ROI:</span>
+                        <strong>198%</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>効率性:</span>
+                        <strong>ベースライン</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>改善余地:</span>
+                        <strong>+49%</strong>
+                    </div>
+                </div>
+                <div class="result-card">
+                    <h3>⚡ 実装効果予測</h3>
+                    <div class="metric-row">
+                        <span>売上増加:</span>
+                        <strong>+32,184万円</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>利益増加:</span>
+                        <strong>+8,647万円</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>実装期間:</span>
+                        <strong>2週間</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- 投資優先度自動算出 -->
+            <div class="card">
+                <h2>💰 投資優先度自動算出</h2>
+                <p>ROI・リスク・戦略性の総合評価による投資判断支援</p>
+                
+                <div class="investment-grid">
+                    <div class="investment-card">
+                        <div class="priority-badge priority-high">最優先</div>
+                        <h3>SR事業部 システム改革</h3>
+                        <div class="metric-row">
+                            <span>投資額:</span>
+                            <strong>2,800万円</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>期待ROI:</span>
+                            <strong>285%</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>回収期間:</span>
+                            <strong>14ヶ月</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>戦略重要度:</span>
+                            <strong>極高</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="investment-card">
+                        <div class="priority-badge priority-medium">重要</div>
+                        <h3>W事業部 設備増強</h3>
+                        <div class="metric-row">
+                            <span>投資額:</span>
+                            <strong>1,650万円</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>期待ROI:</span>
+                            <strong>198%</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>回収期間:</span>
+                            <strong>18ヶ月</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>戦略重要度:</span>
+                            <strong>高</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="investment-card">
+                        <div class="priority-badge priority-low">標準</div>
+                        <h3>RCD事業部 R&D拡大</h3>
+                        <div class="metric-row">
+                            <span>投資額:</span>
+                            <strong>950万円</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>期待ROI:</span>
+                            <strong>156%</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>回収期間:</span>
+                            <strong>24ヶ月</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span>戦略重要度:</span>
+                            <strong>中</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- リスク評価マトリックス -->
+            <div class="card">
+                <h2>⚠️ リスク評価マトリックス</h2>
+                <p>多次元リスク分析・リスク許容度別対応策自動生成</p>
+                
+                <div style="margin: 15px 0; font-size: 14px; color: #4a5568;">
+                    <strong>影響度 × 発生確率</strong> リスクマップ
+                </div>
+                
+                <div class="matrix-grid">
+                    <div class="matrix-cell risk-low">
+                        <div>
+                            <div>低影響</div>
+                            <div>低確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-medium">
+                        <div>
+                            <div>中影響</div>
+                            <div>低確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>高影響</div>
+                            <div>低確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>極高影響</div>
+                            <div>低確率</div>
+                        </div>
+                    </div>
+                    
+                    <div class="matrix-cell risk-low">
+                        <div>
+                            <div>低影響</div>
+                            <div>中確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-medium">
+                        <div>
+                            <div>中影響</div>
+                            <div>中確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>高影響</div>
+                            <div>中確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>極高影響</div>
+                            <div>中確率</div>
+                        </div>
+                    </div>
+                    
+                    <div class="matrix-cell risk-medium">
+                        <div>
+                            <div>低影響</div>
+                            <div>高確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>中影響</div>
+                            <div>高確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>高影響</div>
+                            <div>高確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>極高影響</div>
+                            <div>高確率</div>
+                        </div>
+                    </div>
+                    
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>低影響</div>
+                            <div>極高確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>中影響</div>
+                            <div>極高確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>高影響</div>
+                            <div>極高確率</div>
+                        </div>
+                    </div>
+                    <div class="matrix-cell risk-high">
+                        <div>
+                            <div>極高影響</div>
+                            <div>極高確率</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #4f46e5;">
+                    <h4 style="color: #2d3748; margin-bottom: 10px;">🎯 重点監視リスク</h4>
+                    <div class="metric-row">
+                        <span>SR事業部赤字リスク:</span>
+                        <strong style="color: #e53e3e;">高影響・中確率</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>市場変動リスク:</span>
+                        <strong style="color: #dd6b20;">中影響・高確率</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>システム障害リスク:</span>
+                        <strong style="color: #38a169;">低影響・低確率</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 意思決定支援ダッシュボード -->
+        <div class="investment-analyzer">
+            <h2>📈 役員向けエグゼクティブサマリー自動生成</h2>
+            <p>AI分析結果に基づく経営戦略提案・意思決定サポート</p>
+            
+            <div class="chart-container">
+                <h3 style="color: #2d3748; margin-bottom: 15px;">📊 財務パフォーマンス予測</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 20px; font-weight: bold; color: #48bb78;">218,450万円</div>
+                        <div style="font-size: 12px; color: #718096;">6ヶ月後売上予測</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 20px; font-weight: bold; color: #4f46e5;">6,890万円</div>
+                        <div style="font-size: 12px; color: #718096;">6ヶ月後営業利益予測</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 20px; font-weight: bold; color: #ed8936;">+3.2%</div>
+                        <div style="font-size: 12px; color: #718096;">売上成長率（対前年）</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 20px; font-weight: bold; color: #38a169;">19.5%</div>
+                        <div style="font-size: 12px; color: #718096;">利益率改善幅</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border-left: 4px solid #4f46e5; margin: 20px 0;">
+                <h4 style="color: #2d3748; margin-bottom: 15px;">🎯 AI推奨アクション（優先順位順）</h4>
+                <ol style="padding-left: 20px; color: #4a5568; line-height: 1.8;">
+                    <li><strong>SR事業部赤字解消:</strong> 仕入先再交渉により原価率27.2%→20%削減実行（効果: +1,127万円/月）</li>
+                    <li><strong>W事業部設備投資:</strong> 1,650万円投資によりキャパシティ30%向上（ROI: 198%）</li>
+                    <li><strong>RC事業部マーケティング強化:</strong> デジタル化投資750万円（新規顧客+18.5%）</li>
+                    <li><strong>RCD事業部R&D拡充:</strong> 次世代技術開発加速（競争優位性確保）</li>
+                </ol>
+            </div>
+
+            <div style="background: #fff5f5; padding: 20px; border-radius: 8px; border-left: 4px solid #e53e3e; margin: 20px 0;">
+                <h4 style="color: #742a2a; margin-bottom: 15px;">⚠️ 緊急対応要項目</h4>
+                <ul style="padding-left: 20px; color: #742a2a; line-height: 1.8;">
+                    <li>SR事業部営業利益-454万円の早急な改善（目標: 3ヶ月以内黒字転換）</li>
+                    <li>商品仕入率改善交渉の即時開始（既存取引先との再契約協議）</li>
+                    <li>システム稼働率99.9%維持のための保守体制強化</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- アクションボタン -->
+        <div class="action-buttons">
+            <button class="action-btn btn-primary" onclick="generateExecutiveReport()">
+                📋 役員会資料生成
+            </button>
+            <button class="action-btn btn-secondary" onclick="exportAnalysis()">
+                📊 分析結果エクスポート
+            </button>
+            <button class="action-btn btn-success" onclick="implementOptimization()">
+                ⚡ 最適化案実装
+            </button>
+            <button class="action-btn btn-primary" onclick="scheduleReview()">
+                📅 定期レビュー設定
+            </button>
+        </div>
+    </div>
+
+    <!-- 通知システム -->
+    <div class="notification" id="notification">
+        <div style="font-weight: bold; margin-bottom: 5px;">システム通知</div>
+        <div id="notification-message">処理が完了しました</div>
+    </div>
+
+    <script>
+        // リアルタイムデータ更新
+        function updateKPIs() {
+            const revenue = document.getElementById('total-revenue');
+            const profit = document.getElementById('total-profit');
+            const accuracy = document.getElementById('prediction-accuracy');
+            const uptime = document.getElementById('system-uptime');
+
+            // リアルタイムデータシミュレーション
+            setInterval(() => {
+                const currentRevenue = parseInt(revenue.textContent.replace(',', ''));
+                const fluctuation = Math.random() * 1000 - 500;
+                const newRevenue = Math.max(0, currentRevenue + Math.round(fluctuation));
+                revenue.textContent = newRevenue.toLocaleString();
+
+                const currentProfit = parseInt(profit.textContent.replace(',', ''));
+                const profitChange = Math.random() * 200 - 100;
+                const newProfit = Math.max(0, currentProfit + Math.round(profitChange));
+                profit.textContent = newProfit.toLocaleString();
+
+                const currentAccuracy = parseFloat(accuracy.textContent);
+                const accuracyChange = (Math.random() - 0.5) * 0.2;
+                const newAccuracy = Math.min(100, Math.max(90, currentAccuracy + accuracyChange));
+                accuracy.textContent = newAccuracy.toFixed(1) + '%';
+            }, 5000);
+        }
+
+        // スライダー値更新
+        function setupSliders() {
+            const sliders = ['sr-staff', 'rc-budget', 'w-equipment', 'rcd-rd'];
+            const units = ['人', '万円', '万円', '万円'];
+
+            sliders.forEach((id, index) => {
+                const slider = document.getElementById(id);
+                const display = document.getElementById(id + '-value');
+                
+                slider.addEventListener('input', function() {
+                    const value = parseInt(this.value);
+                    display.textContent = value.toLocaleString() + units[index];
+                });
+            });
+        }
+
+        // リソース最適化実行
+        function optimizeResources() {
+            const btn = document.querySelector('.optimize-btn');
+            const results = document.getElementById('optimization-results');
+            
+            btn.innerHTML = '<span class="status-indicator status-running"></span>AI最適化実行中...';
+            btn.disabled = true;
+
+            // 最適化計算シミュレーション
+            setTimeout(() => {
+                results.style.display = 'grid';
+                results.style.animation = 'fadeIn 0.5s ease';
+                
+                btn.innerHTML = '<span class="status-indicator status-running"></span>最適化完了';
+                btn.disabled = false;
+                
+                showNotification('リソース配分最適化が完了しました');
+                
+                // 3秒後に元の状態に戻す
+                setTimeout(() => {
+                    btn.innerHTML = '<span class="status-indicator status-analyzing"></span>AI最適化実行';
+                }, 3000);
+            }, 2000);
+        }
+
+        // 通知表示
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 役員会資料生成
+        function generateExecutiveReport() {
+            showNotification('役員会資料を生成中...');
+            setTimeout(() => {
+                showNotification('役員会資料の生成が完了しました');
+            }, 1500);
+        }
+
+        // 分析結果エクスポート
+        function exportAnalysis() {
+            showNotification('分析結果をエクスポート中...');
+            setTimeout(() => {
+                showNotification('Excel形式での分析結果エクスポートが完了しました');
+            }, 1000);
+        }
+
+        // 最適化案実装
+        function implementOptimization() {
+            if (confirm('最適化案を実装しますか？この操作は元に戻せません。')) {
+                showNotification('最適化案の実装を開始しました');
+                setTimeout(() => {
+                    showNotification('最適化案の実装が完了しました');
+                }, 2000);
+            }
+        }
+
+        // 定期レビュー設定
+        function scheduleReview() {
+            showNotification('定期レビューのスケジュールを設定しました');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateKPIs();
+            setupSliders();
+            
+            // CSS Animation定義
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

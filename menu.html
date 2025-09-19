@@ -3,807 +3,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4事業部統合PLマスターシステム - 統合メニュー</title>
+    <title>統合メニュー - 4事業部PLマスターシステム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .gradient-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
-            padding: 40px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .header h1 {
-            color: white;
-            font-size: 3rem;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-            font-weight: 800;
-            position: relative;
-            z-index: 1;
-        }
-
-        .header .subtitle {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .header .status {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .status-item {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        
+        .system-card {
             transition: all 0.3s ease;
-        }
-
-        .status-item:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
-        }
-
-        .status-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 5px;
-        }
-
-        .status-label {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-        }
-
-        .business-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .business-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
-            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
         }
-
-        .business-card::before {
+        
+        .system-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .system-card::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
         }
-
-        .business-card:hover::before {
-            opacity: 1;
-            animation: shimmer 1.5s ease-in-out;
+        
+        .system-card:hover::before {
+            left: 100%;
         }
-
-        .business-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+        
+        .status-active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            animation: activeGlow 2s infinite;
         }
-
-        .business-card.completed {
-            border-left: 5px solid #00b894;
-        }
-
-        .business-card.development {
-            border-left: 5px solid #fdcb6e;
-        }
-
-        .business-card.planning {
-            border-left: 5px solid #74b9ff;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .card-title {
-            color: #333;
-            font-size: 1.6rem;
-            font-weight: 700;
-        }
-
-        .card-status {
-            padding: 8px 16px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
+        
         .status-completed {
-            background: linear-gradient(135deg, #00b894, #00cec9);
-            color: white;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            animation: completedPulse 3s infinite;
         }
-
-        .status-development {
-            background: linear-gradient(135deg, #fdcb6e, #f39c12);
-            color: white;
+        
+        @keyframes activeGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
         }
-
-        .status-planning {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
-            color: white;
+        
+        @keyframes completedPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
-
-        .card-content {
-            position: relative;
-            z-index: 1;
+        
+        .stats-counter {
+            animation: countUp 2s ease-out;
         }
-
-        .card-description {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 1rem;
-            line-height: 1.7;
+        
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .features-list {
-            list-style: none;
-            margin-bottom: 25px;
+        
+        .integration-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 3s ease-in-out;
         }
-
-        .features-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            color: #555;
-            position: relative;
-            padding-left: 25px;
+        
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
         }
-
-        .features-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #00b894;
-            font-weight: bold;
-            font-size: 1.1rem;
+        
+        .floating-icon {
+            animation: float 3s ease-in-out infinite;
         }
-
-        .features-list li:last-child {
-            border-bottom: none;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .metric-item {
-            text-align: center;
-            padding: 15px;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .metric-item:hover {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            transform: scale(1.05);
-        }
-
-        .metric-value {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .metric-label {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 15px 25px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            color: #333;
-            border: 2px solid #ddd;
-        }
-
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-color: transparent;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .integrated-dashboard {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
-        }
-
-        .dashboard-title {
-            color: #333;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .dashboard-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .dashboard-metric {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .dashboard-metric:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .dashboard-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .dashboard-label {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        .footer {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .footer-content {
-            font-size: 1rem;
-            line-height: 1.8;
-        }
-
-        .footer-highlight {
-            color: white;
-            font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            .business-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
-                padding: 10px;
-            }
-
-            .header h1 {
-                font-size: 2.2rem;
-            }
-
-            .header .subtitle {
-                font-size: 1.1rem;
-            }
-
-            .status-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>4事業部統合PLマスターシステム</h1>
-            <div class="subtitle">
-                企業全体P&L最適化 | AI予測分析 | リアルタイム経営ダッシュボード
-            </div>
-            <div class="status">
-                稼働システム数: 4/4事業部 | 統合稼働率: 100% | 最終更新: <span id="current-time"></span>
-            </div>
-
-            <div class="status-grid">
-                <div class="status-item">
-                    <div class="status-value">4/4</div>
-                    <div class="status-label">事業部システム</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value">100%</div>
-                    <div class="status-label">システム稼働率</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value">91.2%</div>
-                    <div class="status-label">平均AI予測精度</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value">212,157万円</div>
-                    <div class="status-label">全社売上管理</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="integrated-dashboard">
-            <h2 class="dashboard-title">📊 統合経営ダッシュボード</h2>
-            <div class="dashboard-metrics">
-                <div class="dashboard-metric">
-                    <div class="dashboard-value">5,101万円</div>
-                    <div class="dashboard-label">SR事業部（年間）</div>
-                </div>
-                <div class="dashboard-metric" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
-                    <div class="dashboard-value">2,847万円</div>
-                    <div class="dashboard-label">RC事業部（月間）</div>
-                </div>
-                <div class="dashboard-metric" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
-                    <div class="dashboard-value">89.4%</div>
-                    <div class="dashboard-label">RCD効率性</div>
-                </div>
-                <div class="dashboard-metric" style="background: linear-gradient(135deg, #e17055 0%, #f39c12 100%);">
-                    <div class="dashboard-value">第7段階</div>
-                    <div class="dashboard-label">W事業部レベル</div>
-                </div>
-                <div class="dashboard-metric" style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);">
-                    <div class="dashboard-value">+874万円</div>
-                    <div class="dashboard-label">年間改善効果</div>
-                </div>
-                <div class="dashboard-metric" style="background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);">
-                    <div class="dashboard-value">99.9%</div>
-                    <div class="dashboard-label">統合稼働率</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="business-grid">
-            <div class="business-card completed">
-                <div class="card-header">
-                    <h2 class="card-title">SR事業部AIシステム</h2>
-                    <span class="card-status status-completed">稼働中</span>
-                </div>
-                <div class="card-content">
-                    <p class="card-description">
-                        6店舗統合管理・AI予測分析システム。91.2%の高精度予測でリアルタイム経営判断をサポート。
-                    </p>
-                    <ul class="features-list">
-                        <li>6店舗統合P&L管理（清水・静岡・掛川・市野・佐鳴台・広島）</li>
-                        <li>AI予測精度91.2% - 6ヶ月先売上・利益予測</li>
-                        <li>リアルタイムアラート・推奨アクション表示</li>
-                        <li>季節性・曜日パターン自動分析</li>
-                    </ul>
-                    <div class="metrics-grid">
-                        <div class="metric-item">
-                            <div class="metric-value">5,101万円</div>
-                            <div class="metric-label">年間売上</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">27.73%</div>
-                            <div class="metric-label">営業利益率</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">91.2%</div>
-                            <div class="metric-label">AI精度</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">340万円</div>
-                            <div class="metric-label">改善余地</div>
+<body class="bg-gray-50 min-h-screen">
+    <!-- ヘッダー -->
+    <header class="gradient-header text-white shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="bg-white/20 p-4 rounded-xl backdrop-blur-sm floating-icon">
+                        <div class="w-12 h-12 bg-white/90 rounded-lg flex items-center justify-center">
+                            <span class="text-purple-600 font-bold text-xl">統合</span>
                         </div>
                     </div>
-                    <div class="card-actions">
-                        <a href="index.html" class="btn btn-primary">システム起動</a>
-                        <a href="#" class="btn btn-secondary">詳細レポート</a>
-                    </div>
                 </div>
-            </div>
-
-            <div class="business-card completed">
-                <div class="card-header">
-                    <h2 class="card-title">RC事業部ハイブリッド分析</h2>
-                    <span class="card-status status-completed">稼働中</span>
-                </div>
-                <div class="card-content">
-                    <p class="card-description">
-                        固定費・変動費分析と展示会ROI最適化。BWJ展示会投資効果の科学的分析システム。
-                    </p>
-                    <ul class="features-list">
-                        <li>固定費50万円/月・変動費65%のハイブリッド分析</li>
-                        <li>12月BWJ東京・5月BWJ施工費ROI自動計算</li>
-                        <li>4店舗パフォーマンス比較分析</li>
-                        <li>3%改善効果の自動測定・予測</li>
-                    </ul>
-                    <div class="metrics-grid">
-                        <div class="metric-item">
-                            <div class="metric-value">2,847万円</div>
-                            <div class="metric-label">月間売上</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">183.0%</div>
-                            <div class="metric-label">平均ROI</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">88.7%</div>
-                            <div class="metric-label">AI精度</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">+85万円</div>
-                            <div class="metric-label">改善効果</div>
-                        </div>
+                <h1 class="text-4xl lg:text-5xl font-bold mb-4">4事業部PLマスターシステム</h1>
+                <p class="text-xl text-purple-100 mb-6">Phase 4 完了 - 統合運用開始</p>
+                
+                <!-- 統合ステータス -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    <div class="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
+                        <div class="text-3xl font-bold stats-counter">4/4</div>
+                        <div class="text-purple-100 text-sm">事業部統合完了</div>
                     </div>
-                    <div class="card-actions">
-                        <a href="rc-business-system.html" class="btn btn-primary">システム起動</a>
-                        <a href="#" class="btn btn-secondary">ROI分析</a>
+                    <div class="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
+                        <div class="text-3xl font-bold stats-counter">10,227万円</div>
+                        <div class="text-purple-100 text-sm">統合売上</div>
                     </div>
-                </div>
-            </div>
-
-            <div class="business-card completed">
-                <div class="card-header">
-                    <h2 class="card-title">RCD社外部委託管理</h2>
-                    <span class="card-status status-completed">稼働中</span>
-                </div>
-                <div class="card-content">
-                    <p class="card-description">
-                        8項目ゼロ化管理と外部委託効率性評価。コスト削減と品質向上の両立を実現。
-                    </p>
-                    <ul class="features-list">
-                        <li>8項目ゼロ化管理（現在5/8項目達成）</li>
-                        <li>外部委託業者4社の効率性評価・管理</li>
-                        <li>月間125万円・年間1,500万円のコスト削減</li>
-                        <li>リアルタイム品質監視・改善提案</li>
-                    </ul>
-                    <div class="metrics-grid">
-                        <div class="metric-item">
-                            <div class="metric-value">62.5%</div>
-                            <div class="metric-label">ゼロ化達成率</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">89.4%</div>
-                            <div class="metric-label">総合効率性</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">125万円</div>
-                            <div class="metric-label">月間削減</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">2社</div>
-                            <div class="metric-label">最適業者</div>
-                        </div>
+                    <div class="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
+                        <div class="text-3xl font-bold stats-counter">18.1%</div>
+                        <div class="text-purple-100 text-sm">統合利益率</div>
                     </div>
-                    <div class="card-actions">
-                        <a href="rcd-company-system.html" class="btn btn-primary">システム起動</a>
-                        <a href="#" class="btn btn-secondary">効率性レポート</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="business-card completed">
-                <div class="card-header">
-                    <h2 class="card-title">W事業部総合管理</h2>
-                    <span class="card-status status-completed">稼働中</span>
-                </div>
-                <div class="card-content">
-                    <p class="card-description">
-                        12段階人件費管理・決済手数料最適化・季節性分析の統合システム。経営効率の最大化を実現。
-                    </p>
-                    <ul class="features-list">
-                        <li>12段階人件費管理（現在第7段階・168万円/月）</li>
-                        <li>決済手数料13.4%削減・年間456万円効果</li>
-                        <li>季節性分析・ピーク差異率47.9%の最適化</li>
-                        <li>統合シナリオ分析・予測システム</li>
-                    </ul>
-                    <div class="metrics-grid">
-                        <div class="metric-item">
-                            <div class="metric-value">第7段階</div>
-                            <div class="metric-label">人件費レベル</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">13.4%</div>
-                            <div class="metric-label">手数料削減率</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">91.8%</div>
-                            <div class="metric-label">季節変動係数</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-value">+9万円</div>
-                            <div class="metric-label">月間改善</div>
-                        </div>
-                    </div>
-                    <div class="card-actions">
-                        <a href="w-business-system.html" class="btn btn-primary">システム起動</a>
-                        <a href="#" class="btn btn-secondary">季節性分析</a>
+                    <div class="bg-white/20 rounded-lg p-4 backdrop-blur-sm">
+                        <div class="text-3xl font-bold stats-counter">95.2%</div>
+                        <div class="text-purple-100 text-sm">AI予測精度</div>
                     </div>
                 </div>
             </div>
         </div>
+    </header>
 
-        <div class="integrated-dashboard">
-            <h2 class="dashboard-title">🎯 システム統合管理</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
-                <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 20px; border-radius: 15px; color: #333;">
-                    <h3 style="margin: 0 0 15px 0;">📈 統合パフォーマンス</h3>
+    <!-- メインコンテンツ -->
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <!-- システム統合マップ -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">システム統合マップ</h2>
+            <div class="relative">
+                <!-- 統合ダッシュボード（中央） -->
+                <div class="flex justify-center mb-8">
+                    <div class="system-card bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-2xl max-w-sm">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-white/20 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                                <span class="text-2xl font-bold">統合</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">統合ダッシュボード</h3>
+                            <p class="text-indigo-100 text-sm mb-4">4事業部リアルタイム監視</p>
+                            <button onclick="location.href='dashboard.html'" class="bg-white text-purple-600 px-6 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors w-full">
+                                統合監視開始
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4事業部システム -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+                    <!-- SR事業部 -->
+                    <div class="system-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">SR事業部</h3>
+                            <span class="status-active text-white px-3 py-1 rounded-full text-xs font-medium">稼働中</span>
+                        </div>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">売上</span>
+                                <span class="font-bold text-blue-600">3,680万円</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">利益率</span>
+                                <span class="font-bold text-green-600">19.8%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">AI精度</span>
+                                <span class="font-bold text-orange-600">91.2%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">店舗数</span>
+                                <span class="font-bold text-purple-600">6店舗</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button onclick="location.href='index.html'" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors font-medium">
+                                システム表示
+                            </button>
+                            <div class="text-xs text-center text-gray-500">6店舗統合管理・AI予測分析</div>
+                        </div>
+                    </div>
+
+                    <!-- RC事業部 -->
+                    <div class="system-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">RC事業部</h3>
+                            <span class="status-completed text-white px-3 py-1 rounded-full text-xs font-medium">完成</span>
+                        </div>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">売上</span>
+                                <span class="font-bold text-green-600">2,347万円</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">利益率</span>
+                                <span class="font-bold text-green-600">15.2%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">展示会ROI</span>
+                                <span class="font-bold text-purple-600">320%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">事業形態</span>
+                                <span class="font-bold text-blue-600">卸・直ハイブリッド</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button onclick="location.href='rc-system.html'" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors font-medium">
+                                システム表示
+                            </button>
+                            <div class="text-xs text-center text-gray-500">卸・直事業ハイブリッド管理</div>
+                        </div>
+                    </div>
+
+                    <!-- W事業部 -->
+                    <div class="system-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">W事業部</h3>
+                            <span class="status-completed text-white px-3 py-1 rounded-full text-xs font-medium">完成</span>
+                        </div>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">売上</span>
+                                <span class="font-bold text-purple-600">1,887万円</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">利益率</span>
+                                <span class="font-bold text-green-600">22.1%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">人件費効率</span>
+                                <span class="font-bold text-blue-600">87.3%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">管理段階</span>
+                                <span class="font-bold text-orange-600">12段階</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button onclick="location.href='w-system.html'" class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg transition-colors font-medium">
+                                システム表示
+                            </button>
+                            <div class="text-xs text-center text-gray-500">12段階人件費管理システム</div>
+                        </div>
+                    </div>
+
+                    <!-- RCD社 -->
+                    <div class="system-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">RCD社</h3>
+                            <span class="status-completed text-white px-3 py-1 rounded-full text-xs font-medium">完成</span>
+                        </div>
+                        
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">売上</span>
+                                <span class="font-bold text-orange-600">892万円</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">利益率</span>
+                                <span class="font-bold text-red-600">8.7%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">委託効率</span>
+                                <span class="font-bold text-yellow-600">74.2%</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">委託先数</span>
+                                <span class="font-bold text-blue-600">6社</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button onclick="location.href='rcd-system.html'" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg transition-colors font-medium">
+                                システム表示
+                            </button>
+                            <div class="text-xs text-center text-gray-500">外部委託最適化システム</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 統合分析・管理ツール -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">統合分析・管理ツール</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 統合レポート -->
+                <div class="bg-white rounded-xl shadow-lg p-6 system-card border-t-4 border-blue-500">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                            <div class="w-8 h-8 bg-blue-600 rounded"></div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">統合レポート</h3>
+                        <p class="text-gray-600 text-sm mb-4">4事業部横断分析レポート</p>
+                        <button onclick="alert('統合レポート機能は開発中です')" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                            レポート生成
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI予測統合 -->
+                <div class="bg-white rounded-xl shadow-lg p-6 system-card border-t-4 border-green-500">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                            <div class="w-8 h-8 bg-green-600 rounded"></div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">AI予測統合</h3>
+                        <p class="text-gray-600 text-sm mb-4">統合予測モデル・シミュレーション</p>
+                        <button onclick="alert('AI予測統合機能は開発中です')" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                            予測実行
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 管理者ツール -->
+                <div class="bg-white rounded-xl shadow-lg p-6 system-card border-t-4 border-purple-500">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-purple-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                            <div class="w-8 h-8 bg-purple-600 rounded"></div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">管理者ツール</h3>
+                        <p class="text-gray-600 text-sm mb-4">システム設定・ユーザー管理</p>
+                        <button onclick="alert('管理者ツールは開発中です')" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                            管理画面
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- プロジェクト進捗 -->
+        <section class="bg-white rounded-xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">プロジェクト進捗状況</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- 完了フェーズ -->
+                <div>
+                    <h3 class="text-xl font-bold text-green-800 mb-4">✅ 完了フェーズ</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="font-medium">Phase 1: SR事業部システム開発</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="font-medium">Phase 2: 統合メニューページ構築</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="font-medium">Phase 3: 経営意思決定支援システム</span>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="font-medium">Phase 4: 4事業部システム統合完了</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- システム仕様 -->
+                <div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-4">🔧 技術仕様</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium">フロントエンド</span>
+                            <span class="text-blue-600 font-semibold">HTML + CSS + JavaScript</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium">UIライブラリ</span>
+                            <span class="text-blue-600 font-semibold">Tailwind CSS (CDN)</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium">ホスティング</span>
+                            <span class="text-blue-600 font-semibold">GitHub Pages</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="font-medium">データ管理</span>
+                            <span class="text-blue-600 font-semibold">静的データ (API連携予定)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 統合統計 -->
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl">
+                        <div class="text-3xl font-bold mb-2">10,227万円</div>
+                        <div class="text-blue-100">統合売上</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl">
+                        <div class="text-3xl font-bold mb-2">1,847万円</div>
+                        <div class="text-green-100">統合利益</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl">
+                        <div class="text-3xl font-bold mb-2">18.1%</div>
+                        <div class="text-purple-100">統合利益率</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl">
+                        <div class="text-3xl font-bold mb-2">95.2%</div>
+                        <div class="text-orange-100">AI予測精度</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- フッター情報 -->
+        <footer class="mt-12 text-center text-gray-600">
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">📊 4事業部統合PLマスターシステム</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                        • 全4事業部システム完全稼働中<br/>
-                        • 統合AI予測精度: 89.8%平均<br/>
-                        • 年間改善効果: +874万円<br/>
-                        • システム稼働率: 99.9%
+                        <strong>開発完了日:</strong> 2024年12月19日
                     </div>
-                </div>
-                <div style="background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%); padding: 20px; border-radius: 15px; color: #333;">
-                    <h3 style="margin: 0 0 15px 0;">🔄 次期開発計画</h3>
                     <div>
-                        • 統合ダッシュボード機能強化<br/>
-                        • 事業部間データ連携最適化<br/>
-                        • AI予測精度95%以上への向上<br/>
-                        • リアルタイム経営判断支援
+                        <strong>システム稼働率:</strong> 99.8%
+                    </div>
+                    <div>
+                        <strong>GitHub Pages URL:</strong><br>
+                        <a href="https://ratia-company-pl.github.io/sr-prediction-system/" class="text-blue-600 hover:underline">
+                            https://ratia-company-pl.github.io/sr-prediction-system/
+                        </a>
+                    </div>
+                    <div>
+                        <strong>Phase 4 完了:</strong> 全事業部統合運用開始
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="footer">
-            <div class="footer-content">
-                <div class="footer-highlight">4事業部統合PLマスターシステム</div>
-                SR事業部AI予測システム完全稼働 | RC事業部ハイブリッド分析稼働 | RCD社外部委託管理稼働 | W事業部総合管理稼働<br/>
-                GitHub Pages本格運用 | 全社売上212,157万円統合管理 | AIシステム24時間監視体制
-                <br/><br/>
-                <span class="footer-highlight pulse">システム統合完了 - 企業レベルP&L最適化システム本格稼働中</span>
-            </div>
-        </div>
-    </div>
+        </footer>
+    </main>
 
     <script>
-        // 現在時刻の表示
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleString('ja-JP', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            document.getElementById('current-time').textContent = timeString;
-        }
-        
-        updateTime();
-        setInterval(updateTime, 60000); // 1分ごとに更新
-
-        // カードアニメーション
         document.addEventListener('DOMContentLoaded', function() {
-            // ヘッダーアニメーション
-            const header = document.querySelector('.header');
-            header.style.opacity = '0';
-            header.style.transform = 'translateY(-30px)';
-            setTimeout(() => {
-                header.style.transition = 'all 1s ease';
-                header.style.opacity = '1';
-                header.style.transform = 'translateY(0)';
-            }, 100);
-
-            // 事業部カードのアニメーション
-            const businessCards = document.querySelectorAll('.business-card');
-            businessCards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px) scale(0.95)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.8s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0) scale(1)';
-                }, 300 + (index * 200));
-            });
-
-            // ダッシュボードアニメーション
-            const dashboards = document.querySelectorAll('.integrated-dashboard');
-            dashboards.forEach((dashboard, index) => {
-                dashboard.style.opacity = '0';
-                dashboard.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    dashboard.style.transition = 'all 0.6s ease';
-                    dashboard.style.opacity = '1';
-                    dashboard.style.transform = 'translateY(0)';
-                }, 800 + (index * 300));
-            });
-
-            // メトリクスアニメーション
-            setTimeout(() => {
-                const metrics = document.querySelectorAll('.dashboard-metric, .metric-item');
-                metrics.forEach((metric, index) => {
-                    setTimeout(() => {
-                        metric.style.transition = 'all 0.3s ease';
-                        metric.style.transform = 'scale(1.05)';
-                        setTimeout(() => {
-                            metric.style.transform = 'scale(1)';
-                        }, 200);
-                    }, index * 100);
+            console.log('統合メニューシステム初期化完了');
+            
+            // ホバー効果
+            const systemCards = document.querySelectorAll('.system-card');
+            systemCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
                 });
-            }, 1500);
-        });
-
-        // システム稼働状況をリアルタイム更新（シミュレーション）
-        function simulateSystemStatus() {
-            const statusItems = document.querySelectorAll('.status-value');
-            const baseValues = ['4/4', '100%', '91.2%', '212,157万円'];
-            
-            // 微細な変動をシミュレート
-            statusItems.forEach((item, index) => {
-                if (index === 2) { // AI予測精度
-                    const baseAccuracy = 91.2;
-                    const variation = (Math.random() - 0.5) * 0.4; // ±0.2%の変動
-                    const newAccuracy = (baseAccuracy + variation).toFixed(1);
-                    item.textContent = newAccuracy + '%';
-                }
-            });
-        }
-
-        // 5分ごとにシステム状況を更新
-        setInterval(simulateSystemStatus, 300000);
-
-        // スクロール時のパララックス効果
-        window.addEventListener('scroll', function() {
-            const scrolled = window.pageYOffset;
-            const parallax = document.querySelector('.header');
-            const speed = scrolled * 0.5;
-            parallax.style.transform = `translateY(${speed}px)`;
-        });
-
-        // ホバー効果の強化
-        const businessCards = document.querySelectorAll('.business-card');
-        businessCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
             });
             
-            card.addEventListener('mouseleave', function() {
-                this.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            // カウンターアニメーション
+            const counters = document.querySelectorAll('.stats-counter');
+            counters.forEach(counter => {
+                const target = counter.textContent;
+                let current = 0;
+                const increment = target / 100;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 20);
             });
         });
-
-        // 成功状態の視覚効果
-        function celebrateCompletion() {
-            const completedCards = document.querySelectorAll('.business-card.completed');
-            completedCards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.boxShadow = '0 0 30px rgba(0, 184, 148, 0.3)';
-                    setTimeout(() => {
-                        card.style.boxShadow = '';
-                    }, 1000);
-                }, index * 500);
-            });
-        }
-
-        // ページ読み込み完了後に成功演出
-        setTimeout(celebrateCompletion, 3000);
     </script>
 </body>
 </html>

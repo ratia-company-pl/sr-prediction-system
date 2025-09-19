@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCD社システム - 外部委託最適化システム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #92400e 100%);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .vendor-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .vendor-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+        
+        .vendor-a { border-left-color: #10b981; }
+        .vendor-b { border-left-color: #3b82f6; }
+        .vendor-c { border-left-color: #8b5cf6; }
+        .vendor-d { border-left-color: #ef4444; }
+        .vendor-e { border-left-color: #f59e0b; }
+        .vendor-f { border-left-color: #06b6d4; }
+        
+        .quality-indicator {
+            animation: qualityPulse 2s infinite;
+        }
+        
+        @keyframes qualityPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .cost-bar {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 6px;
+            height: 10px;
+            transition: width 1s ease-out;
+        }
+        
+        .performance-chart {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .performance-85 {
+            background: conic-gradient(#10b981 0deg 306deg, #e5e7eb 306deg 360deg);
+        }
+        
+        .performance-72 {
+            background: conic-gradient(#3b82f6 0deg 259.2deg, #e5e7eb 259.2deg 360deg);
+        }
+        
+        .performance-91 {
+            background: conic-gradient(#8b5cf6 0deg 327.6deg, #e5e7eb 327.6deg 360deg);
+        }
+        
+        .performance-68 {
+            background: conic-gradient(#ef4444 0deg 244.8deg, #e5e7eb 244.8deg 360deg);
+        }
+        
+        .chart-center {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .alert-critical {
+            animation: criticalBlink 1s infinite;
+        }
+        
+        @keyframes criticalBlink {
+            0%, 50% { opacity: 1; background-color: #fef2f2; }
+            51%, 100% { opacity: 0.7; background-color: #fee2e2; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- ヘッダー -->
+    <header class="gradient-header text-white shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white/20 p-3 rounded-lg backdrop-blur-sm">
+                        <div class="w-8 h-8 bg-white/90 rounded flex items-center justify-center">
+                            <span class="text-orange-600 font-bold text-sm">RCD</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl lg:text-3xl font-bold">RCD社システム</h1>
+                        <p class="text-orange-100 text-sm lg:text-base">外部委託最適化システム</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="location.href='menu.html'" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all backdrop-blur-sm">
+                        統合メニュー
+                    </button>
+                    <div class="bg-red-500 px-4 py-2 rounded-lg flex items-center space-x-2 alert-critical">
+                        <div class="w-2 h-2 bg-white rounded-full"></div>
+                        <span class="text-sm font-medium">要改善アラート</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- KPI概要 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-orange-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">総売上</p>
+                        <p class="text-3xl font-bold text-orange-600">892万円</p>
+                        <p class="text-red-500 text-sm mt-1">-2.3% 前月比</p>
+                    </div>
+                    <div class="bg-orange-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-orange-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-red-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">利益率</p>
+                        <p class="text-3xl font-bold text-red-600">8.7%</p>
+                        <p class="text-red-500 text-sm mt-1">目標未達</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-red-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">委託コスト効率</p>
+                        <p class="text-3xl font-bold text-blue-600">74.2%</p>
+                        <p class="text-yellow-500 text-sm mt-1">改善要</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-blue-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">品質スコア</p>
+                        <p class="text-3xl font-bold text-green-600">82.5%</p>
+                        <p class="text-green-500 text-sm mt-1 quality-indicator">監視中</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-green-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 重要アラート -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 alert-critical">
+            <div class="flex items-start space-x-4">
+                <div class="bg-red-500 p-2 rounded-full">
+                    <div class="w-6 h-6 bg-white rounded"></div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-red-800 mb-2">緊急改善要求</h3>
+                    <p class="text-red-700 mb-4">利益率8.7%が目標値10%を大幅に下回っています。委託先の見直しと契約条件の再交渉が急務です。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white p-3 rounded">
+                            <span class="text-gray-600">目標利益率:</span>
+                            <span class="font-bold text-red-600 ml-2">10.0%</span>
+                        </div>
+                        <div class="bg-white p-3 rounded">
+                            <span class="text-gray-600">現在利益率:</span>
+                            <span class="font-bold text-red-600 ml-2">8.7%</span>
+                        </div>
+                        <div class="bg-white p-3 rounded">
+                            <span class="text-gray-600">改善必要額:</span>
+                            <span class="font-bold text-red-600 ml-2">116万円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 委託先管理 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <div class="bg-orange-100 p-2 rounded-lg mr-3">
+                    <div class="w-5 h-5 bg-orange-600 rounded"></div>
+                </div>
+                委託先パフォーマンス管理
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- ベンダーA -->
+                <div class="vendor-card vendor-a bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-gray-800">ベンダーA</h4>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">優良</span>
+                    </div>
+                    <div class="flex justify-center mb-4">
+                        <div class="performance-chart performance-85">
+                            <div class="chart-center">85%</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">契約額</span>
+                            <span class="font-semibold">280万円</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">品質スコア</span>
+                            <span class="font-semibold text-green-600">92%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">納期遵守</span>
+                            <span class="font-semibold text-green-600">98%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">コスト効率</span>
+                            <span class="font-semibold text-green-600">85%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ベンダーB -->
+                <div class="vendor-card vendor-b bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-gray-800">ベンダーB</h4>
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">標準</span>
+                    </div>
+                    <div class="flex justify-center mb-4">
+                        <div class="performance-chart performance-72">
+                            <div class="chart-center">72%</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">契約額</span>
+                            <span class="font-semibold">195万円</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">品質スコア</span>
+                            <span class="font-semibold text-blue-600">78%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">納期遵守</span>
+                            <span class="font-semibold text-blue-600">85%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">コスト効率</span>
+                            <span class="font-semibold text-blue-600">72%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ベンダーC -->
+                <div class="vendor-card vendor-c bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-gray-800">ベンダーC</h4>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">高品質</span>
+                    </div>
+                    <div class="flex justify-center mb-4">
+                        <div class="performance-chart performance-91">
+                            <div class="chart-center">91%</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">契約額</span>
+                            <span class="font-semibold">220万円</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">品質スコア</span>
+                            <span class="font-semibold text-purple-600">95%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">納期遵守</span>
+                            <span class="font-semibold text-purple-600">96%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">コスト効率</span>
+                            <span class="font-semibold text-purple-600">91%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ベンダーD -->
+                <div class="vendor-card vendor-d bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-gray-800">ベンダーD</h4>
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">要改善</span>
+                    </div>
+                    <div class="flex justify-center mb-4">
+                        <div class="performance-chart performance-68">
+                            <div class="chart-center">68%</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">契約額</span>
+                            <span class="font-semibold">150万円</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">品質スコア</span>
+                            <span class="font-semibold text-red-600">65%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">納期遵守</span>
+                            <span class="font-semibold text-red-600">72%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">コスト効率</span>
+                            <span class="font-semibold text-red-600">68%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ベンダーE -->
+                <div class="vendor-card vendor-e bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-gray-800">ベンダーE</h4>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">監視対象</span>
+                    </div>
+                    <div class="flex justify-center mb-4">
+                        <div class="performance-chart performance-72">
+                            <div class="chart-center">76%</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">契約額</span>
+                            <span class="font-semibold">87万円</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">品質スコア</span>
+                            <span class="font-semibold text-yellow-600">76%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">納期遵守</span>
+                            <span class="font-semibold text-yellow-600">81%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">コスト効率</span>
+                            <span class="font-semibold text-yellow-600">76%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ベンダーF -->
+                <div class="vendor-card vendor-f bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-gray-800">ベンダーF</h4>
+                        <span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs">新規</span>
+                    </div>
+                    <div class="flex justify-center mb-4">
+                        <div class="performance-chart performance-85">
+                            <div class="chart-center">83%</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">契約額</span>
+                            <span class="font-semibold">65万円</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">品質スコア</span>
+                            <span class="font-semibold text-cyan-600">83%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">納期遵守</span>
+                            <span class="font-semibold text-cyan-600">88%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">コスト効率</span>
+                            <span class="font-semibold text-cyan-600">83%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- コスト管理・品質監視 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+            <!-- コスト構造分析 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-blue-600 rounded"></div>
+                    </div>
+                    コスト構造分析
+                </h3>
+                
+                <div class="space-y-4">
+                    <!-- 委託費用内訳 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">ベンダーA（製造委託）</span>
+                            <span class="text-sm font-bold text-green-600">280万円 (31%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="cost-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">ベンダーC（技術開発）</span>
+                            <span class="text-sm font-bold text-purple-600">220万円 (25%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="cost-bar" style="width: 79%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">ベンダーB（物流）</span>
+                            <span class="text-sm font-bold text-blue-600">195万円 (22%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="cost-bar" style="width: 70%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">ベンダーD（保守）</span>
+                            <span class="text-sm font-bold text-red-600">150万円 (17%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="cost-bar" style="width: 54%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">その他（E・F）</span>
+                            <span class="text-sm font-bold text-gray-600">152万円 (17%)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="cost-bar" style="width: 54%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4 mt-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-gray-800">総委託費用</span>
+                            <span class="text-lg font-bold text-orange-600">997万円</span>
+                        </div>
+                        <div class="text-sm text-gray-600 mt-1">
+                            売上比率: 111.8% （目標: 90%以下）
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 品質監視システム -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-green-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-green-600 rounded"></div>
+                    </div>
+                    品質監視システム
+                </h3>
+                
+                <div class="space-y-4">
+                    <!-- 品質指標 -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-800 mb-3 flex items-center">
+                            <span class="mr-2">✅</span>品質基準達成
+                        </h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-600">総合品質スコア:</span>
+                                <span class="font-semibold text-green-700 ml-2">82.5%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">不具合率:</span>
+                                <span class="font-semibold text-green-700 ml-2">2.3%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">顧客満足度:</span>
+                                <span class="font-semibold text-green-700 ml-2">4.2/5.0</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">再作業率:</span>
+                                <span class="font-semibold text-green-700 ml-2">1.8%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 監視アラート -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-yellow-800 mb-3 flex items-center">
+                            <span class="mr-2">⚠️</span>監視対象
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">ベンダーD 品質低下:</span>
+                                <span class="font-semibold text-red-600">65% → 改善要</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">ベンダーE 納期遅延:</span>
+                                <span class="font-semibold text-yellow-600">81% → 監視中</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">ベンダーB コスト上昇:</span>
+                                <span class="font-semibold text-yellow-600">+8% → 要交渉</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 改善施策 -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 mb-3 flex items-center">
+                            <span class="mr-2">🔧</span>改善施策
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="text-blue-700">ベンダーD との契約見直し検討</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="text-blue-700">高品質ベンダーへの集約化</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="text-blue-700">SLA (Service Level Agreement) 強化</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="text-blue-700">月次品質レビュー会議実施</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI分析・緊急アクション -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+            <!-- AI分析結果 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-red-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-red-600 rounded"></div>
+                    </div>
+                    AI分析結果
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-red-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-red-800 mb-1">緊急改善必要</h4>
+                                <p class="text-red-700 text-sm">現在の委託構造では利益率目標達成は困難。ベンダーDの契約解除とA・Cへの集約が最適解です。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-yellow-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-yellow-800 mb-1">コスト最適化提案</h4>
+                                <p class="text-yellow-700 text-sm">委託費用を20%削減（200万円減）することで、利益率12.8%達成可能。品質維持が前提条件。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-blue-800 mb-1">契約戦略提案</h4>
+                                <p class="text-blue-700 text-sm">長期契約による単価削減（5-8%）と品質ボーナス制度導入で、委託先のモチベーション向上を実現。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-green-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-green-800 mb-1">新規開拓機会</h4>
+                                <p class="text-green-700 text-sm">ベンダーFの評価が良好。段階的に委託範囲を拡大することで、コスト削減と品質向上の両立が可能。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 緊急アクション -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-orange-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-orange-600 rounded"></div>
+                    </div>
+                    緊急アクション計画
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="border border-red-200 rounded-lg p-4 bg-red-50">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">最緊急</h4>
+                                    <p class="text-gray-600 text-sm">ベンダーD契約解除交渉</p>
+                                </div>
+                            </div>
+                            <span class="text-red-600 text-sm font-medium">即日開始</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-white p-2 rounded">
+                            予想効果: 利益率+1.8%改善、品質リスク除去
+                        </div>
+                    </div>
+
+                    <div class="border border-orange-200 rounded-lg p-4 bg-orange-50">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">高優先度</h4>
+                                    <p class="text-gray-600 text-sm">ベンダーA・C との条件再交渉</p>
+                                </div>
+                            </div>
+                            <span class="text-orange-600 text-sm font-medium">3日以内</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-white p-2 rounded">
+                            予想効果: コスト-8%削減、利益率+0.9%改善
+                        </div>
+                    </div>
+
+                    <div class="border border-yellow-200 rounded-lg p-4 bg-yellow-50">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">中優先度</h4>
+                                    <p class="text-gray-600 text-sm">ベンダーF拡大評価</p>
+                                </div>
+                            </div>
+                            <span class="text-yellow-600 text-sm font-medium">7日以内</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-white p-2 rounded">
+                            予想効果: 新規委託先確保、リスク分散
+                        </div>
+                    </div>
+
+                    <div class="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">計画フェーズ</h4>
+                                    <p class="text-gray-600 text-sm">委託管理システム強化</p>
+                                </div>
+                            </div>
+                            <span class="text-blue-600 text-sm font-medium">14日以内</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-white p-2 rounded">
+                            予想効果: 管理効率+25%向上、品質監視強化
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('RCD社システム初期化完了');
+            
+            // ホバー効果
+            const cards = document.querySelectorAll('.card-hover, .vendor-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    if (this.classList.contains('card-hover')) {
+                        this.style.transform = 'translateY(-2px)';
+                    } else {
+                        this.style.transform = 'scale(1.02)';
+                    }
+                });
+                card.addEventListener('mouseleave', function() {
+                    if (this.classList.contains('card-hover')) {
+                        this.style.transform = 'translateY(0)';
+                    } else {
+                        this.style.transform = 'scale(1)';
+                    }
+                });
+            });
+            
+            // コストバーアニメーション
+            setTimeout(() => {
+                const costBars = document.querySelectorAll('.cost-bar');
+                costBars.forEach(bar => {
+                    const targetWidth = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = targetWidth;
+                    }, 100);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W事業部システム - 12段階人件費管理システム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .grade-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .grade-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+        
+        .grade-1 { border-left-color: #ef4444; }
+        .grade-2 { border-left-color: #f97316; }
+        .grade-3 { border-left-color: #f59e0b; }
+        .grade-4 { border-left-color: #eab308; }
+        .grade-5 { border-left-color: #84cc16; }
+        .grade-6 { border-left-color: #22c55e; }
+        .grade-7 { border-left-color: #10b981; }
+        .grade-8 { border-left-color: #06b6d4; }
+        .grade-9 { border-left-color: #0ea5e9; }
+        .grade-10 { border-left-color: #3b82f6; }
+        .grade-11 { border-left-color: #6366f1; }
+        .grade-12 { border-left-color: #8b5cf6; }
+        
+        .season-indicator {
+            animation: seasonPulse 3s infinite;
+        }
+        
+        @keyframes seasonPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        .capacity-bar {
+            background: linear-gradient(90deg, #8b5cf6 0%, #c084fc 100%);
+            border-radius: 6px;
+            height: 12px;
+            transition: width 1s ease-out;
+        }
+        
+        .efficiency-chart {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .efficiency-85 {
+            background: conic-gradient(#8b5cf6 0deg 306deg, #e5e7eb 306deg 360deg);
+        }
+        
+        .efficiency-92 {
+            background: conic-gradient(#10b981 0deg 331.2deg, #e5e7eb 331.2deg 360deg);
+        }
+        
+        .efficiency-78 {
+            background: conic-gradient(#f59e0b 0deg 280.8deg, #e5e7eb 280.8deg 360deg);
+        }
+        
+        .efficiency-88 {
+            background: conic-gradient(#3b82f6 0deg 316.8deg, #e5e7eb 316.8deg 360deg);
+        }
+        
+        .chart-center {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: #374151;
+        }
+        
+        .workload-bar {
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .workload-bar:hover {
+            transform: scaleX(1.02);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- ヘッダー -->
+    <header class="gradient-header text-white shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white/20 p-3 rounded-lg backdrop-blur-sm">
+                        <div class="w-8 h-8 bg-white/90 rounded flex items-center justify-center">
+                            <span class="text-purple-600 font-bold text-lg">W</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl lg:text-3xl font-bold">W事業部システム</h1>
+                        <p class="text-purple-100 text-sm lg:text-base">12段階人件費管理システム</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="location.href='menu.html'" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all backdrop-blur-sm">
+                        統合メニュー
+                    </button>
+                    <div class="bg-green-500 px-4 py-2 rounded-lg flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-white rounded-full"></div>
+                        <span class="text-sm font-medium">システム稼働中</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- KPI概要 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-purple-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">総売上</p>
+                        <p class="text-3xl font-bold text-purple-600">1,887万円</p>
+                        <p class="text-green-500 text-sm mt-1">+5.2% 前月比</p>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-purple-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">利益率</p>
+                        <p class="text-3xl font-bold text-green-600">22.1%</p>
+                        <p class="text-green-500 text-sm mt-1">+2.1% 改善</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-green-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">人件費効率</p>
+                        <p class="text-3xl font-bold text-blue-600">87.3%</p>
+                        <p class="text-green-500 text-sm mt-1">最適化進行中</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-blue-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 card-hover border-l-4 border-orange-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm mb-2">季節性指数</p>
+                        <p class="text-3xl font-bold text-orange-600">1.12</p>
+                        <p class="text-blue-500 text-sm mt-1 season-indicator">冬季繁忙期</p>
+                    </div>
+                    <div class="bg-orange-100 p-3 rounded-lg">
+                        <div class="w-6 h-6 bg-orange-600 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 12段階人件費管理 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <div class="bg-purple-100 p-2 rounded-lg mr-3">
+                    <div class="w-5 h-5 bg-purple-600 rounded"></div>
+                </div>
+                12段階人件費管理システム
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <!-- グレード1 -->
+                <div class="grade-card grade-1 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード1</h4>
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">新人</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">12名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥1,200</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-red-600">65%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full" style="width: 65%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード2 -->
+                <div class="grade-card grade-2 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード2</h4>
+                        <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">初級</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">15名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥1,350</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-orange-600">72%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-orange-500 h-2 rounded-full" style="width: 72%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード3 -->
+                <div class="grade-card grade-3 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード3</h4>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">初級+</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">18名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥1,500</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-yellow-600">78%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 78%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード4 -->
+                <div class="grade-card grade-4 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード4</h4>
+                        <span class="bg-lime-100 text-lime-800 px-2 py-1 rounded text-xs">中級</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">22名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥1,680</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-lime-600">83%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-lime-500 h-2 rounded-full" style="width: 83%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード5 -->
+                <div class="grade-card grade-5 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード5</h4>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">中級+</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">19名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥1,850</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-green-600">87%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 87%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード6 -->
+                <div class="grade-card grade-6 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード6</h4>
+                        <span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs">上級</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">16名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥2,100</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-emerald-600">91%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-emerald-500 h-2 rounded-full" style="width: 91%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード7 -->
+                <div class="grade-card grade-7 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード7</h4>
+                        <span class="bg-teal-100 text-teal-800 px-2 py-1 rounded text-xs">上級+</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">14名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥2,380</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-teal-600">94%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-teal-500 h-2 rounded-full" style="width: 94%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード8 -->
+                <div class="grade-card grade-8 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード8</h4>
+                        <span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs">専門</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">11名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥2,750</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-cyan-600">96%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-cyan-500 h-2 rounded-full" style="width: 96%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード9 -->
+                <div class="grade-card grade-9 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード9</h4>
+                        <span class="bg-sky-100 text-sky-800 px-2 py-1 rounded text-xs">専門+</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">8名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥3,200</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-sky-600">97%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-sky-500 h-2 rounded-full" style="width: 97%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード10 -->
+                <div class="grade-card grade-10 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード10</h4>
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">エキスパート</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">6名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥3,800</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-blue-600">98%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 98%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード11 -->
+                <div class="grade-card grade-11 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード11</h4>
+                        <span class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-xs">マスター</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">4名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥4,500</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-indigo-600">99%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-indigo-500 h-2 rounded-full" style="width: 99%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- グレード12 -->
+                <div class="grade-card grade-12 bg-white rounded-lg p-4 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-gray-800">グレード12</h4>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">スペシャリスト</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">人数</span>
+                            <span class="font-semibold">2名</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">時給</span>
+                            <span class="font-semibold">¥5,500</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">効率</span>
+                            <span class="font-semibold text-purple-600">100%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 季節性管理・キャパシティ最適化 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+            <!-- 季節性管理 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-orange-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-orange-600 rounded"></div>
+                    </div>
+                    季節性管理システム
+                </h3>
+                
+                <div class="space-y-6">
+                    <!-- 春季 -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-semibold text-green-800 flex items-center">
+                                <span class="mr-2">🌸</span>春季（3-5月）
+                            </h4>
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs">標準期</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-600">需要指数:</span>
+                                <span class="font-semibold text-green-700 ml-2">0.95</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">最適人員:</span>
+                                <span class="font-semibold text-green-700 ml-2">125名</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">効率予測:</span>
+                                <span class="font-semibold text-green-700 ml-2">88%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">コスト:</span>
+                                <span class="font-semibold text-green-700 ml-2">280万円</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 夏季 -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-semibold text-yellow-800 flex items-center">
+                                <span class="mr-2">☀️</span>夏季（6-8月）
+                            </h4>
+                            <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs">閑散期</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-600">需要指数:</span>
+                                <span class="font-semibold text-yellow-700 ml-2">0.78</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">最適人員:</span>
+                                <span class="font-semibold text-yellow-700 ml-2">98名</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">効率予測:</span>
+                                <span class="font-semibold text-yellow-700 ml-2">85%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">コスト:</span>
+                                <span class="font-semibold text-yellow-700 ml-2">220万円</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 秋季 -->
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-semibold text-orange-800 flex items-center">
+                                <span class="mr-2">🍂</span>秋季（9-11月）
+                            </h4>
+                            <span class="bg-orange-500 text-white px-3 py-1 rounded-full text-xs">繁忙準備</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-600">需要指数:</span>
+                                <span class="font-semibold text-orange-700 ml-2">1.05</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">最適人員:</span>
+                                <span class="font-semibold text-orange-700 ml-2">132名</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">効率予測:</span>
+                                <span class="font-semibold text-orange-700 ml-2">90%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">コスト:</span>
+                                <span class="font-semibold text-orange-700 ml-2">295万円</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 冬季 -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-semibold text-blue-800 flex items-center">
+                                <span class="mr-2">❄️</span>冬季（12-2月）
+                            </h4>
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-xs season-indicator">繁忙期</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-600">需要指数:</span>
+                                <span class="font-semibold text-blue-700 ml-2">1.18</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">最適人員:</span>
+                                <span class="font-semibold text-blue-700 ml-2">147名</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">効率予測:</span>
+                                <span class="font-semibold text-blue-700 ml-2">92%</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600">コスト:</span>
+                                <span class="font-semibold text-blue-700 ml-2">330万円</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- キャパシティ最適化 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-blue-600 rounded"></div>
+                    </div>
+                    キャパシティ最適化
+                </h3>
+                
+                <div class="space-y-6">
+                    <!-- 部門別効率 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <div class="efficiency-chart efficiency-85 mx-auto mb-3">
+                                <div class="chart-center">85%</div>
+                            </div>
+                            <h4 class="font-semibold text-gray-800">製造部門</h4>
+                            <p class="text-sm text-gray-600">127名稼働中</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="efficiency-chart efficiency-92 mx-auto mb-3">
+                                <div class="chart-center">92%</div>
+                            </div>
+                            <h4 class="font-semibold text-gray-800">品質管理</h4>
+                            <p class="text-sm text-gray-600">18名稼働中</p>
+                        </div>
+                    </div>
+
+                    <!-- 最適化提案 -->
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-800 mb-3">AI最適化提案</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">グレード4→5昇格推奨:</span>
+                                <span class="font-semibold text-purple-700">3名</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">効率改善予測:</span>
+                                <span class="font-semibold text-green-600">+2.3%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">コスト影響:</span>
+                                <span class="font-semibold text-blue-600">+1.2%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">ROI予測:</span>
+                                <span class="font-semibold text-purple-600">245%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 時間別負荷 -->
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-3">時間別ワークロード</h4>
+                        <div class="space-y-2">
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                    <span>9:00-12:00</span>
+                                    <span>98%稼働</span>
+                                </div>
+                                <div class="workload-bar bg-red-500" style="width: 98%;">高負荷</div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                    <span>13:00-17:00</span>
+                                    <span>87%稼働</span>
+                                </div>
+                                <div class="workload-bar bg-green-500" style="width: 87%;">適正</div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                    <span>18:00-22:00</span>
+                                    <span>65%稼働</span>
+                                </div>
+                                <div class="workload-bar bg-yellow-500" style="width: 65%;">低負荷</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI分析・アクション推奨 -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+            <!-- AI分析結果 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-green-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-green-600 rounded"></div>
+                    </div>
+                    AI分析結果
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-green-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-green-800 mb-1">人件費効率最適化</h4>
+                                <p class="text-green-700 text-sm">12段階システムにより人件費効率が87.3%まで向上。目標90%に向けて順調に推移中です。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-blue-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-blue-800 mb-1">季節性予測精度向上</h4>
+                                <p class="text-blue-700 text-sm">冬季繁忙期の需要予測精度が94.2%に達成。適切な人員配置により効率化を実現しています。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-purple-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-purple-800 mb-1">グレード昇格機会</h4>
+                                <p class="text-purple-700 text-sm">効率指標に基づき、7名の昇格候補を特定。実施により全体効率+1.8%向上見込み。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-orange-500 w-4 h-4 rounded-full mt-1"></div>
+                            <div>
+                                <h4 class="font-semibold text-orange-800 mb-1">コスト最適化提案</h4>
+                                <p class="text-orange-700 text-sm">時間帯別負荷調整により、人件費を月間15万円削減可能。サービス品質は維持されます。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- アクション推奨 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <div class="bg-purple-100 p-2 rounded-lg mr-3">
+                        <div class="w-5 h-5 bg-purple-600 rounded"></div>
+                    </div>
+                    推奨アクション
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">高優先度</h4>
+                                    <p class="text-gray-600 text-sm">グレード4-5昇格実施</p>
+                                </div>
+                            </div>
+                            <span class="text-purple-600 text-sm font-medium">5日以内</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                            予想効果: 効率+2.3%向上、ROI245%
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">中優先度</h4>
+                                    <p class="text-gray-600 text-sm">春季シフト計画策定</p>
+                                </div>
+                            </div>
+                            <span class="text-blue-600 text-sm font-medium">10日以内</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                            予想効果: 季節変動対応、人件費最適化
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">低優先度</h4>
+                                    <p class="text-gray-600 text-sm">新人研修プログラム改善</p>
+                                </div>
+                            </div>
+                            <span class="text-green-600 text-sm font-medium">14日以内</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                            予想効果: 新人効率向上、昇格期間短縮
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">計画フェーズ</h4>
+                                    <p class="text-gray-600 text-sm">AI予測モデル精度向上</p>
+                                </div>
+                            </div>
+                            <span class="text-orange-600 text-sm font-medium">30日以内</span>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                            予想効果: 予測精度+3%向上、最適化強化
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('W事業部システム初期化完了');
+            
+            // ホバー効果
+            const cards = document.querySelectorAll('.card-hover, .grade-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    if (this.classList.contains('card-hover')) {
+                        this.style.transform = 'translateY(-2px)';
+                    } else {
+                        this.style.transform = 'scale(1.02)';
+                    }
+                });
+                card.addEventListener('mouseleave', function() {
+                    if (this.classList.contains('card-hover')) {
+                        this.style.transform = 'translateY(0)';
+                    } else {
+                        this.style.transform = 'scale(1)';
+                    }
+                });
+            });
+            
+            // プログレスバーアニメーション
+            setTimeout(() => {
+                const progressBars = document.querySelectorAll('[style*="width"]');
+                progressBars.forEach(bar => {
+                    if (bar.style.width && bar.classList.contains('capacity-bar')) {
+                        const targetWidth = bar.style.width;
+                        bar.style.width = '0%';
+                        setTimeout(() => {
+                            bar.style.width = targetWidth;
+                        }, 100);
+                    }
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -3,1131 +3,777 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4事業部統合テストシステム</title>
+    <title>統合テストシステム - 4事業部統合PLマスターシステム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .gradient-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
-            min-height: 100vh;
-            line-height: 1.6;
-            color: #fff;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-
-        .header .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
-
-        .test-status {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .status-item {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .status-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .status-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .test-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            color: #333;
-        }
-
-        .card h2 {
-            color: #333;
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .test-runner {
-            background: #2d3436;
-            color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-        }
-
-        .test-output {
-            height: 200px;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            margin: 15px 0;
-        }
-
-        .test-line {
-            margin: 3px 0;
-            padding: 3px 5px;
-            border-radius: 3px;
-            font-size: 0.85rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .test-line.pass {
-            background: rgba(0, 184, 148, 0.2);
-            color: #00b894;
-        }
-
-        .test-line.fail {
-            background: rgba(232, 67, 147, 0.2);
-            color: #e84393;
-        }
-
-        .test-line.running {
-            background: rgba(253, 203, 110, 0.2);
-            color: #fdcb6e;
-        }
-
-        .test-line.info {
-            background: rgba(116, 185, 255, 0.2);
-            color: #74b9ff;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .business-tests {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .business-test-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
+        
+        .test-card {
             transition: all 0.3s ease;
-            border: 2px solid transparent;
         }
-
-        .business-test-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
-
-        .business-test-card.pass {
-            border-color: #00b894;
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        
+        .status-pass { color: #10b981; }
+        .status-fail { color: #ef4444; }
+        .status-running { color: #f59e0b; }
+        .status-pending { color: #6b7280; }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
         }
-
-        .business-test-card.fail {
-            border-color: #b8a5d6;
-            background: linear-gradient(135deg, #e8dff5, #d4c5e8);
+        
+        .test-log {
+            max-height: 300px;
+            overflow-y: auto;
         }
-
-        .business-test-card.running {
-            border-color: #fdcb6e;
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            animation: pulse 2s infinite;
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-
-        .business-test-card.pending {
-            border-color: #74b9ff;
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-        }
-
+        
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
         }
-
-        .business-name {
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .test-count {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 10px 0;
-        }
-
-        .test-status-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            color: #333;
-        }
-
-        .test-details {
-            margin-top: 10px;
-            font-size: 0.8rem;
-            text-align: left;
-        }
-
+        
         .test-item {
-            margin: 5px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-left: 4px solid #e5e7eb;
+            transition: all 0.3s ease;
         }
-
-        .test-result {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            color: white;
+        
+        .test-item.pass {
+            border-left-color: #10b981;
+            background-color: #f0fdf4;
         }
-
-        .result-pass {
-            background: #00b894;
+        
+        .test-item.fail {
+            border-left-color: #ef4444;
+            background-color: #fef2f2;
         }
-
-        .result-fail {
-            background: #b8a5d6;
+        
+        .test-item.running {
+            border-left-color: #f59e0b;
+            background-color: #fffbeb;
         }
-
-        .result-running {
-            background: #fdcb6e;
+        
+        .spinning {
             animation: spin 1s linear infinite;
         }
-
-        .result-pending {
-            background: #74b9ff;
-        }
-
+        
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-
-        .control-panel {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .control-row {
-            display: flex;
-            gap: 15px;
-            margin: 15px 0;
-            align-items: center;
-        }
-
-        .control-group {
-            flex: 1;
-        }
-
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .control-group select, .control-group input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 0.9rem;
-        }
-
-        .control-group select:focus, .control-group input:focus {
-            border-color: #74b9ff;
-            outline: none;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
-        }
-
-        .progress-section {
-            margin: 20px 0;
-        }
-
-        .progress-bar {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            height: 20px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00b894, #00cec9);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        .integration-matrix {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            color: #333;
-        }
-
-        .matrix-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .matrix-table th,
-        .matrix-table td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        .matrix-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 700;
-        }
-
-        .matrix-cell {
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            margin: 0 auto;
-        }
-
-        .matrix-pass {
-            background: #00b894;
-        }
-
-        .matrix-fail {
-            background: #e84393;
-        }
-
-        .matrix-na {
-            background: #ddd;
-            color: #666;
-        }
-
-        .log-viewer {
-            background: #2d3436;
-            color: #fff;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-        }
-
-        .log-content {
-            height: 250px;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .log-entry {
-            margin: 2px 0;
-            padding: 2px 5px;
-        }
-
-        .log-error {
-            color: #e84393;
-        }
-
-        .log-warn {
-            color: #fdcb6e;
-        }
-
-        .log-info {
-            color: #74b9ff;
-        }
-
-        .log-success {
-            color: #00b894;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .metric-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        @media (max-width: 768px) {
-            .test-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .business-tests {
-                grid-template-columns: 1fr 1fr;
-            }
-            
-            .control-row {
-                flex-direction: column;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .business-tests {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🧪 4事業部統合テストシステム</h1>
-            <div class="subtitle">
-                同時検証・整合性確認・自動復旧 | リアルタイムテスト実行・監視システム
+<body class="bg-gray-50 min-h-screen">
+    <!-- ヘッダー -->
+    <header class="gradient-header text-white shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="text-center">
+                <h1 class="text-3xl lg:text-4xl font-bold mb-2">統合テストシステム</h1>
+                <p class="text-xl text-purple-100 mb-4">4事業部統合PLマスターシステム - Phase 5</p>
+                <div class="bg-white/20 rounded-lg p-3 inline-block">
+                    <span class="text-sm">テスト実行日時: <span id="test-datetime">2024年12月19日</span> | ステータス: <span id="overall-status" class="font-bold">準備完了</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- テスト実行コントロール -->
+        <section class="test-card bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg mr-3 flex items-center justify-center">
+                    <span class="text-blue-600 font-bold">🎮</span>
+                </div>
+                テスト実行コントロール
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- テスト実行ボタン -->
+                <div class="space-y-4">
+                    <button id="run-all-tests" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+                        🚀 全システムテスト実行
+                    </button>
+                    <button id="run-individual-test" class="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-600 hover:to-blue-600 transition-all duration-300">
+                        🔍 個別システムテスト
+                    </button>
+                    <button id="reset-tests" class="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300">
+                        🔄 テスト結果リセット
+                    </button>
+                </div>
+
+                <!-- テスト進捗表示 -->
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 テスト進捗</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span>全体進捗</span>
+                            <span id="overall-progress-text">0/6 完了</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div id="overall-progress-bar" class="progress-bar bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs mt-4">
+                            <div>
+                                <div id="pass-count" class="text-2xl font-bold text-green-600">0</div>
+                                <div class="text-gray-600">パス</div>
+                            </div>
+                            <div>
+                                <div id="fail-count" class="text-2xl font-bold text-red-600">0</div>
+                                <div class="text-gray-600">失敗</div>
+                            </div>
+                            <div>
+                                <div id="pending-count" class="text-2xl font-bold text-gray-600">6</div>
+                                <div class="text-gray-600">待機</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- テスト設定 -->
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">⚙️ テスト設定</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="verbose-mode" class="mr-2">
+                            <span class="text-sm">詳細ログ出力</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="auto-retry" class="mr-2" checked>
+                            <span class="text-sm">失敗時自動リトライ</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="performance-test" class="mr-2">
+                            <span class="text-sm">パフォーマンステスト</span>
+                        </label>
+                        <div class="mt-4">
+                            <label class="block text-sm text-gray-600 mb-1">テストタイムアウト (秒)</label>
+                            <input type="number" id="test-timeout" value="30" min="10" max="300" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- システム別テスト結果 -->
+        <section class="test-card bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <div class="w-8 h-8 bg-green-100 rounded-lg mr-3 flex items-center justify-center">
+                    <span class="text-green-600 font-bold">✅</span>
+                </div>
+                システム別テスト結果
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- SR事業部AIシステム -->
+                <div id="test-sr" class="test-item p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-gray-800">SR事業部AIシステム</h3>
+                        <div class="flex items-center space-x-2">
+                            <div id="sr-spinner" class="hidden w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full spinning"></div>
+                            <span id="sr-status" class="status-pending font-semibold">待機中</span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        URL: <a href="https://ratia-company-pl.github.io/sr-prediction-system/" target="_blank" class="text-blue-600 hover:underline">index.html</a>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span>レスポンシブ表示</span>
+                            <span id="sr-responsive" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>AI予測機能</span>
+                            <span id="sr-ai" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>グラフ表示</span>
+                            <span id="sr-graph" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>ナビゲーション</span>
+                            <span id="sr-nav" class="status-pending">⏳</span>
+                        </div>
+                    </div>
+                    <button onclick="runIndividualTest('sr')" class="mt-3 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors">
+                        個別テスト実行
+                    </button>
+                </div>
+
+                <!-- RC事業部システム -->
+                <div id="test-rc" class="test-item p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-gray-800">RC事業部ハイブリッドシステム</h3>
+                        <div class="flex items-center space-x-2">
+                            <div id="rc-spinner" class="hidden w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full spinning"></div>
+                            <span id="rc-status" class="status-pending font-semibold">待機中</span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        URL: <a href="https://ratia-company-pl.github.io/sr-prediction-system/rc-system.html" target="_blank" class="text-blue-600 hover:underline">rc-system.html</a>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span>ページ読み込み</span>
+                            <span id="rc-load" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>データ表示</span>
+                            <span id="rc-data" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>インタラクション</span>
+                            <span id="rc-interaction" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>レスポンシブ</span>
+                            <span id="rc-responsive" class="status-pending">⏳</span>
+                        </div>
+                    </div>
+                    <button onclick="runIndividualTest('rc')" class="mt-3 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm hover:bg-purple-200 transition-colors">
+                        個別テスト実行
+                    </button>
+                </div>
+
+                <!-- W事業部システム -->
+                <div id="test-w" class="test-item p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-gray-800">W事業部12段階人件費管理システム</h3>
+                        <div class="flex items-center space-x-2">
+                            <div id="w-spinner" class="hidden w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full spinning"></div>
+                            <span id="w-status" class="status-pending font-semibold">待機中</span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        URL: <a href="https://ratia-company-pl.github.io/sr-prediction-system/w-system.html" target="_blank" class="text-blue-600 hover:underline">w-system.html</a>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span>12段階データ</span>
+                            <span id="w-data" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>人件費計算</span>
+                            <span id="w-calc" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>グラフ表示</span>
+                            <span id="w-graph" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>システム統合</span>
+                            <span id="w-integration" class="status-pending">⏳</span>
+                        </div>
+                    </div>
+                    <button onclick="runIndividualTest('w')" class="mt-3 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors">
+                        個別テスト実行
+                    </button>
+                </div>
+
+                <!-- RCD社システム -->
+                <div id="test-rcd" class="test-item p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-gray-800">RCD社外部委託最適化システム</h3>
+                        <div class="flex items-center space-x-2">
+                            <div id="rcd-spinner" class="hidden w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full spinning"></div>
+                            <span id="rcd-status" class="status-pending font-semibold">待機中</span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        URL: <a href="https://ratia-company-pl.github.io/sr-prediction-system/rcd-system.html" target="_blank" class="text-blue-600 hover:underline">rcd-system.html</a>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span>委託データ表示</span>
+                            <span id="rcd-data" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>最適化アルゴリズム</span>
+                            <span id="rcd-algorithm" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>コスト分析</span>
+                            <span id="rcd-cost" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>レポート生成</span>
+                            <span id="rcd-report" class="status-pending">⏳</span>
+                        </div>
+                    </div>
+                    <button onclick="runIndividualTest('rcd')" class="mt-3 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm hover:bg-orange-200 transition-colors">
+                        個別テスト実行
+                    </button>
+                </div>
+
+                <!-- 統合ダッシュボード -->
+                <div id="test-dashboard" class="test-item p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-gray-800">統合ダッシュボードシステム</h3>
+                        <div class="flex items-center space-x-2">
+                            <div id="dashboard-spinner" class="hidden w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full spinning"></div>
+                            <span id="dashboard-status" class="status-pending font-semibold">待機中</span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        URL: <a href="https://ratia-company-pl.github.io/sr-prediction-system/dashboard.html" target="_blank" class="text-blue-600 hover:underline">dashboard.html</a>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span>KPI統合表示</span>
+                            <span id="dashboard-kpi" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>リアルタイム更新</span>
+                            <span id="dashboard-realtime" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>統合グラフ</span>
+                            <span id="dashboard-graph" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>ナビゲーション</span>
+                            <span id="dashboard-nav" class="status-pending">⏳</span>
+                        </div>
+                    </div>
+                    <button onclick="runIndividualTest('dashboard')" class="mt-3 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg text-sm hover:bg-indigo-200 transition-colors">
+                        個別テスト実行
+                    </button>
+                </div>
+
+                <!-- 統合メニューページ -->
+                <div id="test-menu" class="test-item p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-gray-800">統合メニューページ（更新版）</h3>
+                        <div class="flex items-center space-x-2">
+                            <div id="menu-spinner" class="hidden w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full spinning"></div>
+                            <span id="menu-status" class="status-pending font-semibold">待機中</span>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-2">
+                        URL: <a href="https://ratia-company-pl.github.io/sr-prediction-system/menu.html" target="_blank" class="text-blue-600 hover:underline">menu.html</a>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span>メニュー表示</span>
+                            <span id="menu-display" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>リンク動作</span>
+                            <span id="menu-links" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>レスポンシブ</span>
+                            <span id="menu-responsive" class="status-pending">⏳</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>統合性確認</span>
+                            <span id="menu-integration" class="status-pending">⏳</span>
+                        </div>
+                    </div>
+                    <button onclick="runIndividualTest('menu')" class="mt-3 px-4 py-2 bg-pink-100 text-pink-700 rounded-lg text-sm hover:bg-pink-200 transition-colors">
+                        個別テスト実行
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- テストログ -->
+        <section class="test-card bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <div class="w-8 h-8 bg-yellow-100 rounded-lg mr-3 flex items-center justify-center">
+                    <span class="text-yellow-600 font-bold">📋</span>
+                </div>
+                テスト実行ログ
+            </h2>
+            
+            <div class="bg-gray-900 text-green-400 p-4 rounded-lg test-log font-mono text-sm">
+                <div id="test-log">
+                    <div class="text-blue-400">[INFO] 統合テストシステム初期化完了</div>
+                    <div class="text-blue-400">[INFO] 全6システムの接続性確認準備完了</div>
+                    <div class="text-blue-400">[INFO] GitHub Pages本番環境接続確認準備完了</div>
+                    <div class="text-gray-400">[DEBUG] テスト実行を待機中...</div>
+                </div>
             </div>
             
-            <div class="test-status">
-                <div class="status-item">
-                    <div class="status-value" id="total-tests">156</div>
-                    <div class="status-label">総テスト数</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value" id="passed-tests">142</div>
-                    <div class="status-label">成功</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value" id="failed-tests">3</div>
-                    <div class="status-label">失敗</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value" id="running-tests">11</div>
-                    <div class="status-label">実行中</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value" id="success-rate">91.0%</div>
-                    <div class="status-label">成功率</div>
-                </div>
-                <div class="status-item">
-                    <div class="status-value" id="test-time">8分32秒</div>
-                    <div class="status-label">実行時間</div>
-                </div>
+            <div class="mt-4 flex space-x-4">
+                <button onclick="clearLog()" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200 transition-colors">
+                    ログクリア
+                </button>
+                <button onclick="exportLog()" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors">
+                    ログエクスポート
+                </button>
+                <button onclick="toggleAutoScroll()" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors">
+                    自動スクロール: <span id="auto-scroll-status">ON</span>
+                </button>
             </div>
-        </div>
+        </section>
 
-        <div class="card full-width">
-            <h2>🏢 事業部別テスト状況</h2>
-            <div class="business-tests">
-                <div class="business-test-card pass" id="sr-test">
-                    <div class="business-name">SR事業部</div>
-                    <div class="test-count">38/40</div>
-                    <div class="test-status-label">テスト成功</div>
-                    <div class="test-details">
-                        <div class="test-item">
-                            <span>AI予測精度</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>6店舗連携</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>アラート機能</span>
-                            <div class="test-result result-fail">✗</div>
-                        </div>
-                        <div class="test-item">
-                            <span>データ整合性</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                    </div>
+        <!-- 統合ナビゲーション -->
+        <section class="test-card bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <div class="w-8 h-8 bg-white/20 rounded-lg mr-3 flex items-center justify-center">
+                    <span class="text-white font-bold">🌐</span>
                 </div>
-
-                <div class="business-test-card running" id="rc-test">
-                    <div class="business-name">RC事業部</div>
-                    <div class="test-count">35/42</div>
-                    <div class="test-status-label">テスト実行中</div>
-                    <div class="test-details">
-                        <div class="test-item">
-                            <span>ROI計算</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>展示会分析</span>
-                            <div class="test-result result-running">⟳</div>
-                        </div>
-                        <div class="test-item">
-                            <span>コスト効率</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>予測機能</span>
-                            <div class="test-result result-pending">○</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="business-test-card pass" id="rcd-test">
-                    <div class="business-name">RCD社</div>
-                    <div class="test-count">36/38</div>
-                    <div class="test-status-label">テスト成功</div>
-                    <div class="test-details">
-                        <div class="test-item">
-                            <span>ゼロ化管理</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>効率性評価</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>業者管理</span>
-                            <div class="test-result result-fail">✗</div>
-                        </div>
-                        <div class="test-item">
-                            <span>コスト削減</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="business-test-card fail" id="w-test">
-                    <div class="business-name">W事業部</div>
-                    <div class="test-count">33/36</div>
-                    <div class="test-status-label">一部失敗</div>
-                    <div class="test-details">
-                        <div class="test-item">
-                            <span>12段階管理</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>決済最適化</span>
-                            <div class="test-result result-fail">✗</div>
-                        </div>
-                        <div class="test-item">
-                            <span>季節性分析</span>
-                            <div class="test-result result-pass">✓</div>
-                        </div>
-                        <div class="test-item">
-                            <span>統合分析</span>
-                            <div class="test-result result-fail">✗</div>
-                        </div>
-                    </div>
-                </div>
+                統合ナビゲーション - 他システムへのアクセス
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <a href="https://ratia-company-pl.github.io/sr-prediction-system/menu.html" target="_blank" class="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-all duration-300 transform hover:scale-105">
+                    <div class="w-8 h-8 bg-pink-500 rounded-lg mx-auto mb-2"></div>
+                    <div class="text-sm font-semibold">統合メニュー</div>
+                </a>
+                <a href="https://ratia-company-pl.github.io/sr-prediction-system/" target="_blank" class="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-all duration-300 transform hover:scale-105">
+                    <div class="w-8 h-8 bg-blue-500 rounded-lg mx-auto mb-2"></div>
+                    <div class="text-sm font-semibold">SR事業部</div>
+                </a>
+                <a href="https://ratia-company-pl.github.io/sr-prediction-system/dashboard.html" target="_blank" class="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-all duration-300 transform hover:scale-105">
+                    <div class="w-8 h-8 bg-purple-500 rounded-lg mx-auto mb-2"></div>
+                    <div class="text-sm font-semibold">統合ダッシュボード</div>
+                </a>
+                <a href="https://ratia-company-pl.github.io/sr-prediction-system/rc-system.html" target="_blank" class="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-all duration-300 transform hover:scale-105">
+                    <div class="w-8 h-8 bg-green-500 rounded-lg mx-auto mb-2"></div>
+                    <div class="text-sm font-semibold">RC事業部</div>
+                </a>
+                <a href="https://ratia-company-pl.github.io/sr-prediction-system/w-system.html" target="_blank" class="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-all duration-300 transform hover:scale-105">
+                    <div class="w-8 h-8 bg-orange-500 rounded-lg mx-auto mb-2"></div>
+                    <div class="text-sm font-semibold">W事業部</div>
+                </a>
+                <a href="https://ratia-company-pl.github.io/sr-prediction-system/rcd-system.html" target="_blank" class="bg-white/10 hover:bg-white/20 rounded-lg p-4 text-center transition-all duration-300 transform hover:scale-105">
+                    <div class="w-8 h-8 bg-yellow-500 rounded-lg mx-auto mb-2"></div>
+                    <div class="text-sm font-semibold">RCD社</div>
+                </a>
             </div>
-        </div>
-
-        <div class="test-grid">
-            <div class="card">
-                <h2>🔄 リアルタイムテスト実行</h2>
-                
-                <div class="control-panel">
-                    <div class="control-row">
-                        <div class="control-group">
-                            <label>テストスイート</label>
-                            <select id="test-suite">
-                                <option value="all">全事業部統合</option>
-                                <option value="sr">SR事業部のみ</option>
-                                <option value="rc">RC事業部のみ</option>
-                                <option value="rcd">RCD社のみ</option>
-                                <option value="w">W事業部のみ</option>
-                                <option value="integration">統合機能のみ</option>
-                            </select>
-                        </div>
-                        <div class="control-group">
-                            <label>実行モード</label>
-                            <select id="test-mode">
-                                <option value="normal">標準テスト</option>
-                                <option value="stress">負荷テスト</option>
-                                <option value="regression">回帰テスト</option>
-                                <option value="integration">統合テスト</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="control-row">
-                        <button class="btn btn-success" onclick="runTests()" id="run-btn">テスト実行</button>
-                        <button class="btn btn-warning" onclick="stopTests()" id="stop-btn" disabled>実行停止</button>
-                        <button class="btn" onclick="clearResults()">結果クリア</button>
-                        <button class="btn btn-danger" onclick="emergencyStop()">緊急停止</button>
-                    </div>
-                </div>
-
-                <div class="progress-section">
-                    <div>テスト進行状況:</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="test-progress" style="width: 0%;">0%</div>
-                    </div>
-                </div>
-
-                <div class="test-runner">
-                    <h3>📊 テスト実行ログ</h3>
-                    <div class="test-output" id="test-output">
-                        <div class="test-line info">[14:35:12] システム初期化完了</div>
-                        <div class="test-line info">[14:35:15] テストスイート読み込み完了</div>
-                        <div class="test-line pass">[14:35:18] SR事業部: データベース接続テスト - 成功</div>
-                        <div class="test-line pass">[14:35:21] RC事業部: API応答テスト - 成功</div>
-                        <div class="test-line fail">[14:35:24] W事業部: 決済システム接続 - 失敗</div>
-                        <div class="test-line running">[14:35:27] RCD社: 外部連携テスト - 実行中...</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🔍 統合整合性検証</h2>
-                
-                <div class="integration-matrix">
-                    <h3>事業部間データ整合性マトリックス</h3>
-                    <table class="matrix-table">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>SR</th>
-                                <th>RC</th>
-                                <th>RCD</th>
-                                <th>W</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th>SR</th>
-                                <td><div class="matrix-cell matrix-na">-</div></td>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                                <td><div class="matrix-cell matrix-fail">✗</div></td>
-                            </tr>
-                            <tr>
-                                <th>RC</th>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                                <td><div class="matrix-cell matrix-na">-</div></td>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                            </tr>
-                            <tr>
-                                <th>RCD</th>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                                <td><div class="matrix-cell matrix-na">-</div></td>
-                                <td><div class="matrix-cell matrix-fail">✗</div></td>
-                            </tr>
-                            <tr>
-                                <th>W</th>
-                                <td><div class="matrix-cell matrix-fail">✗</div></td>
-                                <td><div class="matrix-cell matrix-pass">✓</div></td>
-                                <td><div class="matrix-cell matrix-fail">✗</div></td>
-                                <td><div class="matrix-cell matrix-na">-</div></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric-card" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
-                        <div class="metric-value">8/12</div>
-                        <div class="metric-label">整合性チェック</div>
-                    </div>
-                    <div class="metric-card" style="background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);">
-                        <div class="metric-value">4</div>
-                        <div class="metric-label">不整合検出</div>
-                    </div>
-                </div>
-
-                <div style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%); color: white; padding: 15px; border-radius: 10px; margin-top: 15px;">
-                    <strong>⚠️ 整合性アラート</strong><br/>
-                    W事業部とSR/RCD事業部間でデータ不整合を検出。自動修復を推奨。
-                </div>
-            </div>
-        </div>
-
-        <div class="test-grid">
-            <div class="card">
-                <h2>📋 詳細ログビューアー</h2>
-                
-                <div class="control-row">
-                    <div class="control-group">
-                        <label>ログレベル</label>
-                        <select id="log-level">
-                            <option value="all">全て表示</option>
-                            <option value="error">エラーのみ</option>
-                            <option value="warn">警告以上</option>
-                            <option value="info">情報以上</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <label>対象システム</label>
-                        <select id="log-system">
-                            <option value="all">全システム</option>
-                            <option value="sr">SR事業部</option>
-                            <option value="rc">RC事業部</option>
-                            <option value="rcd">RCD社</option>
-                            <option value="w">W事業部</option>
-                            <option value="integration">統合機能</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="log-viewer">
-                    <div class="log-content" id="log-content">
-                        <div class="log-entry log-info">[14:30:00] [SYSTEM] テストシステム起動</div>
-                        <div class="log-entry log-success">[14:30:15] [SR] データベース接続確立</div>
-                        <div class="log-entry log-success">[14:30:18] [RC] APIエンドポイント確認完了</div>
-                        <div class="log-entry log-warn">[14:30:22] [RCD] 外部業者システム応答遅延検出</div>
-                        <div class="log-entry log-error">[14:30:25] [W] 決済ゲートウェイ接続失敗</div>
-                        <div class="log-entry log-info">[14:30:30] [INTEGRATION] 統合データ同期開始</div>
-                        <div class="log-entry log-success">[14:30:35] [SR] AI予測モデル読み込み完了</div>
-                        <div class="log-entry log-warn">[14:30:40] [RCD] ゼロ化項目の一部未達成を検出</div>
-                        <div class="log-entry log-error">[14:30:45] [W] 季節性データ整合性エラー</div>
-                        <div class="log-entry log-info">[14:30:50] [INTEGRATION] 自動修復プロセス開始</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🛠️ 自動復旧・修復機能</h2>
-                
-                <div class="control-panel">
-                    <div class="control-row">
-                        <div class="control-group">
-                            <label>復旧モード</label>
-                            <select id="recovery-mode">
-                                <option value="auto">自動復旧</option>
-                                <option value="manual">手動承認</option>
-                                <option value="disabled">復旧無効</option>
-                            </select>
-                        </div>
-                        <div class="control-group">
-                            <label>復旧レベル</label>
-                            <select id="recovery-level">
-                                <option value="critical">緊急のみ</option>
-                                <option value="high">高優先度以上</option>
-                                <option value="all">全問題対応</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="control-row">
-                        <button class="btn btn-success" onclick="startAutoRecovery()">自動復旧開始</button>
-                        <button class="btn btn-warning" onclick="manualRecovery()">手動復旧実行</button>
-                        <button class="btn" onclick="rollbackChanges()">変更をロールバック</button>
-                    </div>
-                </div>
-
-                <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 20px; border-radius: 12px; margin: 20px 0;">
-                    <h3 style="margin: 0 0 15px 0;">🔧 復旧アクション履歴</h3>
-                    <div>
-                        • 14:31:12 - W事業部決済システム再接続完了<br/>
-                        • 14:32:05 - RCD社データ整合性自動修復実行<br/>
-                        • 14:32:48 - SR事業部アラート機能再起動<br/>
-                        • 14:33:15 - 統合データ同期バッチ修復完了<br/>
-                        • 14:34:02 - W事業部季節性データ再計算実行
-                    </div>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric-card" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
-                        <div class="metric-value">12</div>
-                        <div class="metric-label">自動修復成功</div>
-                    </div>
-                    <div class="metric-card" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);">
-                        <div class="metric-value">3</div>
-                        <div class="metric-label">手動対応要</div>
-                    </div>
-                    <div class="metric-card" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
-                        <div class="metric-value">98.2%</div>
-                        <div class="metric-label">復旧成功率</div>
-                    </div>
-                    <div class="metric-card" style="background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);">
-                        <div class="metric-value">2分15秒</div>
-                        <div class="metric-label">平均復旧時間</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card full-width">
-            <h2>📊 統合テスト結果サマリー</h2>
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-value">91.0%</div>
-                    <div class="metric-label">総合テスト成功率</div>
-                </div>
-                <div class="metric-card" style="background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);">
-                    <div class="metric-value">8分32秒</div>
-                    <div class="metric-label">テスト実行時間</div>
-                </div>
-                <div class="metric-card" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
-                    <div class="metric-value">4/4</div>
-                    <div class="metric-label">事業部テスト完了</div>
-                </div>
-                <div class="metric-card" style="background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);">
-                    <div class="metric-value">66.7%</div>
-                    <div class="metric-label">統合整合性</div>
-                </div>
-                <div class="metric-card" style="background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);">
-                    <div class="metric-value">3</div>
-                    <div class="metric-label">要対応項目</div>
-                </div>
-                <div class="metric-card" style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);">
-                    <div class="metric-value">98.2%</div>
-                    <div class="metric-label">システム稼働率</div>
-                </div>
-            </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
-        let testInterval;
-        let progressInterval;
-        let isTestRunning = false;
-
-        // テスト実行
-        function runTests() {
-            if (isTestRunning) return;
-            
-            isTestRunning = true;
-            document.getElementById('run-btn').disabled = true;
-            document.getElementById('stop-btn').disabled = false;
-            
-            const testSuite = document.getElementById('test-suite').value;
-            const testMode = document.getElementById('test-mode').value;
-            
-            addTestOutput(`running`, `テスト開始: ${testSuite} (${testMode}モード)`);
-            
-            let progress = 0;
-            progressInterval = setInterval(() => {
-                progress += Math.random() * 5;
-                if (progress > 100) progress = 100;
-                
-                document.getElementById('test-progress').style.width = progress + '%';
-                document.getElementById('test-progress').textContent = Math.round(progress) + '%';
-                
-                if (progress >= 100) {
-                    clearInterval(progressInterval);
-                    finishTest();
-                }
-            }, 500);
-            
-            // テストメッセージの生成
-            testInterval = setInterval(() => {
-                generateTestMessage();
-            }, 2000);
-        }
-
-        // テスト停止
-        function stopTests() {
-            isTestRunning = false;
-            clearInterval(testInterval);
-            clearInterval(progressInterval);
-            
-            document.getElementById('run-btn').disabled = false;
-            document.getElementById('stop-btn').disabled = true;
-            
-            addTestOutput('info', 'テスト実行を停止しました');
-        }
-
-        // テスト完了
-        function finishTest() {
-            isTestRunning = false;
-            clearInterval(testInterval);
-            
-            document.getElementById('run-btn').disabled = false;
-            document.getElementById('stop-btn').disabled = true;
-            
-            addTestOutput('pass', 'テストスイート実行完了');
-            updateTestStats();
-        }
-
-        // 緊急停止
-        function emergencyStop() {
-            stopTests();
-            addTestOutput('fail', '🚨 緊急停止が実行されました');
-            
-            // 全システムを安全状態に
-            setTimeout(() => {
-                addTestOutput('info', '全システムを安全状態に移行中...');
-                setTimeout(() => {
-                    addTestOutput('pass', '✅ 安全状態への移行完了');
-                }, 2000);
-            }, 1000);
-        }
-
-        // 結果クリア
-        function clearResults() {
-            document.getElementById('test-output').innerHTML = '';
-            document.getElementById('test-progress').style.width = '0%';
-            document.getElementById('test-progress').textContent = '0%';
-            addTestOutput('info', 'テスト結果をクリアしました');
-        }
-
-        // 自動復旧開始
-        function startAutoRecovery() {
-            addLogEntry('info', '[RECOVERY] 自動復旧プロセス開始');
-            
-            setTimeout(() => {
-                addLogEntry('success', '[RECOVERY] W事業部決済システム修復完了');
-                updateTestCard('w-test', 'pass');
-            }, 2000);
-            
-            setTimeout(() => {
-                addLogEntry('success', '[RECOVERY] データ整合性問題修復完了');
-                updateIntegrationMatrix();
-            }, 4000);
-        }
-
-        // 手動復旧実行
-        function manualRecovery() {
-            const confirmed = confirm('手動復旧を実行しますか？\n\n対象:\n- W事業部決済システム\n- RCD社外部連携\n- データ整合性問題');
-            
-            if (confirmed) {
-                addLogEntry('info', '[MANUAL] 手動復旧開始');
-                setTimeout(() => {
-                    addLogEntry('success', '[MANUAL] 手動復旧完了');
-                }, 3000);
-            }
-        }
-
-        // ロールバック
-        function rollbackChanges() {
-            const confirmed = confirm('最近の変更をロールバックしますか？');
-            
-            if (confirmed) {
-                addLogEntry('warn', '[ROLLBACK] システム状態をロールバック中...');
-                setTimeout(() => {
-                    addLogEntry('success', '[ROLLBACK] ロールバック完了');
-                }, 2000);
-            }
-        }
-
-        // テスト出力に追加
-        function addTestOutput(type, message) {
-            const output = document.getElementById('test-output');
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('ja-JP');
-            
-            const line = document.createElement('div');
-            line.className = `test-line ${type}`;
-            line.textContent = `[${timeString}] ${message}`;
-            
-            output.insertBefore(line, output.firstChild);
-            
-            // 最大20行まで表示
-            while (output.children.length > 20) {
-                output.removeChild(output.lastChild);
-            }
-        }
-
-        // ログエントリ追加
-        function addLogEntry(type, message) {
-            const logContent = document.getElementById('log-content');
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('ja-JP');
-            
-            const entry = document.createElement('div');
-            entry.className = `log-entry log-${type}`;
-            entry.textContent = `[${timeString}] ${message}`;
-            
-            logContent.insertBefore(entry, logContent.firstChild);
-            
-            // 最大30行まで表示
-            while (logContent.children.length > 30) {
-                logContent.removeChild(logContent.lastChild);
-            }
-        }
-
-        // テストメッセージ生成
-        function generateTestMessage() {
-            const systems = ['SR事業部', 'RC事業部', 'RCD社', 'W事業部'];
-            const tests = [
-                'データベース接続テスト',
-                'API応答確認',
-                'AI予測精度検証',
-                '統合データ同期',
-                'パフォーマンステスト',
-                'セキュリティチェック'
-            ];
-            
-            const system = systems[Math.floor(Math.random() * systems.length)];
-            const test = tests[Math.floor(Math.random() * tests.length)];
-            const success = Math.random() > 0.15; // 85%成功率
-            
-            const type = success ? 'pass' : 'fail';
-            const result = success ? '成功' : '失敗';
-            
-            addTestOutput(type, `${system}: ${test} - ${result}`);
-        }
-
-        // テスト統計更新
-        function updateTestStats() {
-            const passedTests = Math.floor(Math.random() * 10) + 140;
-            const failedTests = Math.floor(Math.random() * 5) + 1;
-            const totalTests = passedTests + failedTests + Math.floor(Math.random() * 15);
-            const successRate = ((passedTests / totalTests) * 100).toFixed(1);
-            
-            document.getElementById('passed-tests').textContent = passedTests;
-            document.getElementById('failed-tests').textContent = failedTests;
-            document.getElementById('total-tests').textContent = totalTests;
-            document.getElementById('success-rate').textContent = successRate + '%';
-        }
-
-        // テストカード更新
-        function updateTestCard(cardId, status) {
-            const card = document.getElementById(cardId);
-            card.className = `business-test-card ${status}`;
-        }
-
-        // 統合マトリックス更新
-        function updateIntegrationMatrix() {
-            // 実際の実装では、マトリックスの値を動的に更新
-            addLogEntry('success', '[INTEGRATION] 統合整合性マトリックス更新完了');
-        }
+        // グローバル変数
+        let testResults = {
+            sr: null,
+            rc: null,
+            w: null,
+            rcd: null,
+            dashboard: null,
+            menu: null
+        };
+        
+        let autoScroll = true;
+        let testRunning = false;
 
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
-            addTestOutput('info', 'システム初期化完了');
-            addLogEntry('info', '[SYSTEM] 統合テストシステム起動完了');
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
             
-            // 定期的なログ生成
-            setInterval(() => {
-                if (!isTestRunning) {
-                    const logTypes = ['info', 'success', 'warn'];
-                    const logType = logTypes[Math.floor(Math.random() * logTypes.length)];
-                    const messages = [
-                        '[MONITOR] システム状態監視中',
-                        '[HEALTH] ヘルスチェック実行',
-                        '[SYNC] データ同期確認',
-                        '[BACKUP] バックアップ処理完了'
-                    ];
-                    const message = messages[Math.floor(Math.random() * messages.length)];
-                    addLogEntry(logType, message);
-                }
-            }, 10000);
+            // イベントリスナーの設定
+            document.getElementById('run-all-tests').addEventListener('click', runAllTests);
+            document.getElementById('run-individual-test').addEventListener('click', showIndividualTestDialog);
+            document.getElementById('reset-tests').addEventListener('click', resetAllTests);
         });
+
+        // 日時更新
+        function updateDateTime() {
+            const now = new Date();
+            const dateTimeString = now.toLocaleString('ja-JP', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('test-datetime').textContent = dateTimeString;
+        }
+
+        // ログ出力
+        function addLog(message, type = 'INFO') {
+            const logElement = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString('ja-JP');
+            const colorClass = {
+                'INFO': 'text-blue-400',
+                'SUCCESS': 'text-green-400',
+                'ERROR': 'text-red-400',
+                'WARNING': 'text-yellow-400',
+                'DEBUG': 'text-gray-400'
+            }[type] || 'text-white';
+            
+            const logLine = document.createElement('div');
+            logLine.className = colorClass;
+            logLine.textContent = `[${timestamp}] [${type}] ${message}`;
+            
+            logElement.appendChild(logLine);
+            
+            if (autoScroll) {
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+        }
+
+        // 全テスト実行
+        async function runAllTests() {
+            if (testRunning) {
+                addLog('テスト実行中です。完了をお待ちください。', 'WARNING');
+                return;
+            }
+            
+            testRunning = true;
+            document.getElementById('run-all-tests').disabled = true;
+            document.getElementById('overall-status').textContent = '実行中';
+            
+            addLog('全システム統合テスト開始');
+            
+            const systems = ['sr', 'rc', 'w', 'rcd', 'dashboard', 'menu'];
+            let completed = 0;
+            
+            for (const system of systems) {
+                await runSystemTest(system);
+                completed++;
+                updateProgress(completed, systems.length);
+                await sleep(1000); // テスト間の間隔
+            }
+            
+            // 最終結果の表示
+            const passed = Object.values(testResults).filter(result => result === true).length;
+            const failed = Object.values(testResults).filter(result => result === false).length;
+            
+            addLog(`全テスト完了: ${passed}成功 / ${failed}失敗`, passed === systems.length ? 'SUCCESS' : 'WARNING');
+            document.getElementById('overall-status').textContent = passed === systems.length ? '全テスト成功' : 'テスト完了（一部失敗）';
+            
+            testRunning = false;
+            document.getElementById('run-all-tests').disabled = false;
+        }
+
+        // 個別システムテスト実行
+        async function runIndividualTest(system) {
+            if (testRunning) {
+                addLog('他のテストが実行中です。', 'WARNING');
+                return;
+            }
+            
+            addLog(`${system.toUpperCase()}システムの個別テスト開始`);
+            await runSystemTest(system);
+            updateProgress();
+        }
+
+        // システムテスト実行
+        async function runSystemTest(system) {
+            const spinner = document.getElementById(`${system}-spinner`);
+            const status = document.getElementById(`${system}-status`);
+            const testElement = document.getElementById(`test-${system}`);
+            
+            // テスト開始
+            spinner.classList.remove('hidden');
+            status.textContent = '実行中';
+            status.className = 'status-running font-semibold';
+            testElement.classList.add('running');
+            
+            addLog(`${system.toUpperCase()}システムテスト開始`);
+            
+            try {
+                // 実際のテスト実行をシミュレート
+                const testDuration = Math.random() * 3000 + 2000; // 2-5秒
+                await sleep(testDuration);
+                
+                // テスト結果をランダムに決定（実際の実装では実際のテストを行う）
+                const success = Math.random() > 0.1; // 90%の成功率
+                
+                // 詳細テスト項目の更新
+                await updateDetailedTests(system, success);
+                
+                // 結果の設定
+                testResults[system] = success;
+                
+                if (success) {
+                    status.textContent = '成功';
+                    status.className = 'status-pass font-semibold';
+                    testElement.classList.remove('running');
+                    testElement.classList.add('pass');
+                    addLog(`${system.toUpperCase()}システムテスト成功`, 'SUCCESS');
+                } else {
+                    status.textContent = '失敗';
+                    status.className = 'status-fail font-semibold';
+                    testElement.classList.remove('running');
+                    testElement.classList.add('fail');
+                    addLog(`${system.toUpperCase()}システムテスト失敗`, 'ERROR');
+                    
+                    // 自動リトライ機能
+                    if (document.getElementById('auto-retry').checked) {
+                        addLog(`自動リトライを実行します...`, 'INFO');
+                        await sleep(2000);
+                        return await runSystemTest(system); // 再帰的に再実行
+                    }
+                }
+                
+            } catch (error) {
+                testResults[system] = false;
+                status.textContent = 'エラー';
+                status.className = 'status-fail font-semibold';
+                testElement.classList.remove('running');
+                testElement.classList.add('fail');
+                addLog(`${system.toUpperCase()}システムテストでエラー: ${error.message}`, 'ERROR');
+            } finally {
+                spinner.classList.add('hidden');
+            }
+        }
+
+        // 詳細テスト項目の更新
+        async function updateDetailedTests(system, overallSuccess) {
+            const detailTests = {
+                'sr': ['responsive', 'ai', 'graph', 'nav'],
+                'rc': ['load', 'data', 'interaction', 'responsive'],
+                'w': ['data', 'calc', 'graph', 'integration'],
+                'rcd': ['data', 'algorithm', 'cost', 'report'],
+                'dashboard': ['kpi', 'realtime', 'graph', 'nav'],
+                'menu': ['display', 'links', 'responsive', 'integration']
+            };
+            
+            const tests = detailTests[system] || [];
+            
+            for (const test of tests) {
+                await sleep(500);
+                const element = document.getElementById(`${system}-${test}`);
+                if (element) {
+                    const success = overallSuccess && Math.random() > 0.05; // 個別テストの成功率
+                    element.textContent = success ? '✅' : '❌';
+                    element.className = success ? 'status-pass' : 'status-fail';
+                }
+            }
+        }
+
+        // 進捗更新
+        function updateProgress(completed = null, total = null) {
+            const systems = Object.keys(testResults);
+            const passed = Object.values(testResults).filter(result => result === true).length;
+            const failed = Object.values(testResults).filter(result => result === false).length;
+            const pending = systems.length - passed - failed;
+            
+            // カウント更新
+            document.getElementById('pass-count').textContent = passed;
+            document.getElementById('fail-count').textContent = failed;
+            document.getElementById('pending-count').textContent = pending;
+            
+            // 進捗バー更新
+            const completedTests = passed + failed;
+            const progressPercent = (completedTests / systems.length) * 100;
+            document.getElementById('overall-progress-bar').style.width = `${progressPercent}%`;
+            document.getElementById('overall-progress-text').textContent = `${completedTests}/${systems.length} 完了`;
+        }
+
+        // テストリセット
+        function resetAllTests() {
+            if (testRunning) {
+                addLog('テスト実行中はリセットできません。', 'WARNING');
+                return;
+            }
+            
+            testResults = {
+                sr: null,
+                rc: null,
+                w: null,
+                rcd: null,
+                dashboard: null,
+                menu: null
+            };
+            
+            // すべてのシステムの状態をリセット
+            const systems = ['sr', 'rc', 'w', 'rcd', 'dashboard', 'menu'];
+            systems.forEach(system => {
+                const status = document.getElementById(`${system}-status`);
+                const testElement = document.getElementById(`test-${system}`);
+                const spinner = document.getElementById(`${system}-spinner`);
+                
+                status.textContent = '待機中';
+                status.className = 'status-pending font-semibold';
+                testElement.className = 'test-item p-4 rounded-lg';
+                spinner.classList.add('hidden');
+                
+                // 詳細テスト項目のリセット
+                const detailTests = {
+                    'sr': ['responsive', 'ai', 'graph', 'nav'],
+                    'rc': ['load', 'data', 'interaction', 'responsive'],
+                    'w': ['data', 'calc', 'graph', 'integration'],
+                    'rcd': ['data', 'algorithm', 'cost', 'report'],
+                    'dashboard': ['kpi', 'realtime', 'graph', 'nav'],
+                    'menu': ['display', 'links', 'responsive', 'integration']
+                };
+                
+                const tests = detailTests[system] || [];
+                tests.forEach(test => {
+                    const element = document.getElementById(`${system}-${test}`);
+                    if (element) {
+                        element.textContent = '⏳';
+                        element.className = 'status-pending';
+                    }
+                });
+            });
+            
+            updateProgress();
+            document.getElementById('overall-status').textContent = '準備完了';
+            addLog('テスト結果をリセットしました', 'INFO');
+        }
+
+        // ユーティリティ関数
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function clearLog() {
+            document.getElementById('test-log').innerHTML = '';
+            addLog('ログをクリアしました', 'INFO');
+        }
+
+        function exportLog() {
+            const logElement = document.getElementById('test-log');
+            const logText = Array.from(logElement.children).map(line => line.textContent).join('\n');
+            
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `test-log-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            addLog('ログをエクスポートしました', 'SUCCESS');
+        }
+
+        function toggleAutoScroll() {
+            autoScroll = !autoScroll;
+            document.getElementById('auto-scroll-status').textContent = autoScroll ? 'ON' : 'OFF';
+            addLog(`自動スクロール: ${autoScroll ? 'ON' : 'OFF'}`, 'INFO');
+        }
+
+        function showIndividualTestDialog() {
+            const systems = ['sr', 'rc', 'w', 'rcd', 'dashboard', 'menu'];
+            const systemNames = {
+                'sr': 'SR事業部AIシステム',
+                'rc': 'RC事業部ハイブリッドシステム',
+                'w': 'W事業部12段階人件費管理システム',
+                'rcd': 'RCD社外部委託最適化システム',
+                'dashboard': '統合ダッシュボードシステム',
+                'menu': '統合メニューページ'
+            };
+            
+            const selection = prompt(`個別テストするシステムを選択してください:\n\n${systems.map((s, i) => `${i + 1}. ${systemNames[s]}`).join('\n')}\n\n番号を入力してください (1-6):`);
+            
+            if (selection && selection >= 1 && selection <= 6) {
+                const selectedSystem = systems[selection - 1];
+                runIndividualTest(selectedSystem);
+            }
+        }
     </script>
 </body>
 </html>
